@@ -1,0 +1,10 @@
+#appBarMain{
+    background-color: #8C99E0;
+    position: fixed;
+    z-index: 100;
+    
+   
+}
+*{
+    margin: 0;
+}

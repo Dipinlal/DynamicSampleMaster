@@ -1,0 +1,11 @@
+.custom-alertBox {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Choose your alert color */
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+  }
+  
