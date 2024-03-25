@@ -13,7 +13,9 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import "./detailed.css"
 import Header from "./HeaderComponents/Header";
 import Body from "./BodyComponents/Body";
-import { getFields } from "../../Apis/Api";
+import { getFields, postEmployee } from "../../apis/Api";
+import AlertBox from "../AlertBox/AlertBox"
+import { Savings } from "@mui/icons-material";
 
 function Detailed() {
 
@@ -22,9 +24,15 @@ function Detailed() {
 
   const [headerData, setheaderData] = useState([])
   const [bodyData, setbodyData] = useState([])
+  const [saveValidation, setsaveValidation] = useState(false)
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertcolor, setalertcolor] = useState("#000000")
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [headerFormData, setheaderFormData] = useState([])
+  const [saving, setsaving] = useState(false)
 
- 
-
+console.log(headerFormData);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -33,9 +41,14 @@ function Detailed() {
     const iDocType = location.state?.iDoctype;
     
 
-
-
-
+    const handleFieldError = (fieldKey, errorMessage) => {
+      setFieldErrors(prevErrors => ({
+        ...prevErrors,
+        [fieldKey]: errorMessage,
+      }));
+    };
+    
+    const resetFieldErrors = () => setFieldErrors({});
    
 
       //select main and attachements
@@ -52,7 +65,7 @@ function Detailed() {
             
          const response = await getFields()
             
-       console.log(response);
+       
        if(response.data.result){
         setheaderData(JSON.parse(response.data.result))   
        }
@@ -104,9 +117,230 @@ function Detailed() {
       
       }, [iTransId,iId,iDocType]);
       
+  const resetSavevalidation = ()=>{
+   
+    setsaveValidation(false)
 
+  }    
+  // const handleSave = async()=>{
+  //   try {
+  //     console.log(headerFormData);
+  //     const employeeData ={
+        
+  //         "id": 0,
+  //         "name": headerFormData.sName,
+  //         "dob": headerFormData.dDob,
+  //         "address": headerFormData.sAddress,
+  //         "cityId": 0,
+  //         "countryId":0,
+  //         "pinCode": 0,
+  //         "dateofJoining": headerFormData.dDateofJoining,
+  //         "departmentId": headerFormData.iDepartmentId,
+  //         "previousSalary": headerFormData.nPreviousSalary,
+  //         "currentSalary": headerFormData.nCurrentSalary
+        
+  //     }
+  //     const response = await postEmployee(employeeData)
+  //     console.log(response);
+  //     setsaving(false)
+  //   } catch (error) {
+  //     console.log(error);
+  //     setsaving(false)
+  //   }
+   
+  // }
 
-  return (
+  const handleSaveClick = async()=>{
+    setsaveValidation(true)
+    setsaving(true)
+  }
+  useEffect(() => {
+    const handleSave = async () => {
+      // Ensure there are no errors before proceeding with the save
+      const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
+      if (errorsArray.length === 0 && saving) {
+        try {
+          // Proceed with the saving logic here
+          // Your existing save logic
+          console.log("Saving data:", headerFormData);
+          const employeeData ={
+        
+            "id": 0,
+            "name": headerFormData.sName,
+            "dob": headerFormData.dDob,
+            "address": headerFormData.sAddress,
+            "cityId": headerFormData.iId,
+            "countryId":headerFormData.iId,
+            "pinCode": headerFormData.iPinCode,
+            "dateofJoining": headerFormData.dDateofJoining,
+            "departmentId": headerFormData.iDepartmentId,
+            "previousSalary": headerFormData.nPreviousSalary,
+            "currentSalary": headerFormData.nCurrentSalary
+          
+        }
+        const response = await postEmployee(employeeData)
+          console.log(response.data.message);
+          if(response.status === 200){
+            setAlertMessage(response.data.message);
+            setShowAlert(true);
+            setalertcolor("#28a745")//green
+         
+           
+        
+            setTimeout(() => {
+              setShowAlert(false);
+              
+        
+            }, 1000);
+           }
+           else{
+            setAlertMessage(response.data.message);
+            setShowAlert(true);
+            setalertcolor("#ffcc00")//yellow
+        
+            
+            setTimeout(() => {
+              setShowAlert(false);
+              // navigate('/Home')
+        
+            }, 1000);
+           }
+          // Handle successful save (e.g., show success message, navigate away, etc.)
+          setsaving(false); // Reset saving state
+        } catch (error) {
+          console.log(error);
+          console.log(error.response.data.errors.employee[0]);
+          if (error.response && error.response.status) {
+            switch (error.response.status) {
+              case 400://bad request
+               
+              setAlertMessage(error.response.data.errors.employee[0]);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
+            
+      
+              setTimeout(() => {
+                setShowAlert(false);
+                
+      
+              }, 3000);
+                break;
+              case 401://unauthorized
+                
+                setAlertMessage(error.response.data.message);
+                setShowAlert(true);
+                setalertcolor("#ffcc00")//yellow
+              
+        
+                setTimeout(() => {
+                  setShowAlert(false);
+                  
+        
+                }, 1000);
+               
+                break;
+              case 403://forbidden
+              setAlertMessage(error.response.data.message);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
+            
+      
+              setTimeout(() => {
+                setShowAlert(false);
+                
+      
+              }, 1000);
+               
+                break;
+              case 404://Notfound
+                
+                setAlertMessage(error.response.data.message);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
+            
+      
+              setTimeout(() => {
+                setShowAlert(false);
+              
+      
+              }, 1000);
+                break;
+              case 409://conflict
+              setAlertMessage(error.response.data.message);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
+            
+      
+              setTimeout(() => {
+                setShowAlert(false);
+                
+      
+              }, 1000);
+               
+                break;
+              case 500:
+                console.error("A 500 Internal Server Error occurred.");
+                // Handle server errors
+                break;
+              default:
+                console.error(`An error occurred: ${error.response.status}`);
+                // Handle other types of errors
+                break;
+            }
+          } else {
+            // If the error does not have a response status code, it might be a network error or something else
+            console.error("An error occurred:", error.message);
+            // Handle errors that aren't server responses, like network errors
+          }
+          // Handle save error (e.g., show error message)
+          setsaving(false); // Reset saving state
+        }
+      } else if (errorsArray.length > 0) {
+        const [firstErrorKey, firstErrorMessage] = errorsArray[0];
+        setAlertMessage(`${firstErrorKey}: ${firstErrorMessage}`);
+        setShowAlert(true);
+        setalertcolor("#ffcc00"); // yellow for errors
+        setTimeout(() => {
+        setShowAlert(false);
+                
+          
+        }, 1000);
+        setsaving(false); // Ensure we reset the saving flag if there are errors
+      }
+    };
+  
+    handleSave();
+  }, [fieldErrors, saving]); // Depend on fieldErrors and saving
+  
+  // useEffect(()=>{
+  
+  //     const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
+ 
+  //   console.log(fieldErrors);
+  //     if (errorsArray.length > 0) {
+  //       // Show first error or all errors concatenated, depending on your UI design
+  //       const [firstErrorKey, firstErrorMessage] = errorsArray[0];
+  //       setAlertMessage(`${firstErrorKey}: ${firstErrorMessage}`);
+  //       setShowAlert(true);
+  //       setalertcolor("#ffcc00"); // yellow for errors
+  //       setTimeout(() => {
+  //       setShowAlert(false);
+                
+          
+  //       }, 1000);
+  //       // Optionally, reset validation trigger and errors after showing the alert
+  //       resetSavevalidation();
+        
+  //       setsaving(false)
+  //     }
+  //     if(errorsArray.length === 0 && saving){
+  //       handleSave()
+  //     }
+
+    
+  // },[fieldErrors,saving])
+
+  return (<><AlertBox message={alertMessage} show={showAlert} color={alertcolor}/>
     <div className="CustomerListMain">
       <Navbar />
       <div className="CLMS1"></div>
@@ -115,8 +349,8 @@ function Detailed() {
           <div>
             <h2 className="CLTCS1T1">{pageTitle}</h2>{" "}
           </div>
-          {/* <div className="CLTCS1D2">
-            <Button
+          <div className="CLTCS1D2">
+            {/* <Button
               id="CLTCS1D2B1"
               onClick={handleNew}
               startIcon={
@@ -124,22 +358,24 @@ function Detailed() {
               }
             >
               New
-            </Button>
+            </Button> */}
             <Button
               id="CLTCS1D2B2"
-              onClick={handleSave}
+              disabled={saving}
+              onClick={handleSaveClick}
               startIcon={<SaveIcon id="CLTCS1D2BI" className="CLTCS1D2B" />}
             >
               Save
             </Button>
-            <Button
+            
+            {/* <Button
               id="CLTCS1D2B2"
               onClick={handlePrint}
               startIcon={<PrintIcon id="CLTCS1D2BI" className="CLTCS1D2B" />}
             >
               Print
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               id="CLTCS1D2B3"
               onClick={handleDelete}
               startIcon={
@@ -147,38 +383,40 @@ function Detailed() {
               }
             >
               Delete
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               id="CLTCS1D2B4"
               onClick={handleClose}
               startIcon={<ArrowBackIcon id="CLTCS1D2BI" className="CLTCS1D2B" />}
             >
               
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               id="CLTCS1D2B4"
               onClick={handleClose}
               startIcon={<ArrowForwardIcon id="CLTCS1D2BI" className="CLTCS1D2B" />}
             >
               
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               id="CLTCS1D2B4"
               onClick={handleClose}
               startIcon={<CloseIcon id="CLTCS1D2BI" className="CLTCS1D2B" />}
             >
               Close
-            </Button>
-          </div> */}
+            </Button> */}
+          </div>
         </div>
 
         
         
       </div>
-      <Header headerData={headerData}/>
-      {/* <Body bodyData={bodyData}/> */}
+      <Header headerData={headerData} triggerValidation={saveValidation}  handleFieldError={handleFieldError} 
+  resetFieldErrors={resetFieldErrors} headerFormData={headerFormData} setheaderFormData={setheaderFormData}
+    />
      
     </div>
+    </>
   )
 }
 

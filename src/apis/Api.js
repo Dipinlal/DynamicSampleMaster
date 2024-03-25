@@ -70,3 +70,17 @@ export const getAutocomplete = async (itag) => {
     const response = await axios.get(`${BASE_URL}${itag}`,headers)
     return response;
 };
+
+export const postEmployee = async (payload) => {
+  console.log(payload);
+  const token = `${localStorage.getItem("accessToken")}`
+  console.log(token);
+  const response = await axios.post(`${BASE_URL}/Employee/UpsertEmployee`,payload,{
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  })
+    return response;
+  //return makeAuthorizedRequest("post","/Employee/UpsertEmployee",payload);
+};

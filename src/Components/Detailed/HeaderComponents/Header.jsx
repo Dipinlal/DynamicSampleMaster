@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import DynamicInputFieldHeader from './HeaderInputType'
 
-function Header({headerData}) {
+function Header({headerData,triggerValidation,handleFieldError,headerFormData,setheaderFormData}) {
 
-    console.log(headerData);
+    
+   
     const [selectedHeaderMain, setselectedHeaderMain] = useState("Main")
-    const [formData, setformData] = useState("")
+    const [formData, setformData] = useState(headerFormData)
+    
 
     const fixedFields = [{
       sFieldName:"sDocNo",
@@ -71,6 +73,9 @@ function Header({headerData}) {
   iLinkTag:0
 },
   ]
+ 
+  // Reset errors when needed, such as on successful save or field value change
+ 
     useEffect(() => {
       if (headerData && Array.isArray(headerData)) {
           const newFormData = headerData.reduce((acc, curr) => {
@@ -94,7 +99,13 @@ function Header({headerData}) {
         })
 
     }
-   console.log(formData);
+   useEffect(() => {
+     const data = {
+      ...formData
+     }
+     setheaderFormData(data)
+   }, [formData])
+   
   return (
     <div className="CLTCS2">
     {/* <div className="CLTCS2D1">
@@ -126,32 +137,33 @@ function Header({headerData}) {
           ))
         } */}
        
-      {headerData.map((field, index) => (
+      { headerData.sort((a, b) => a.iFieldOrder - b.iFieldOrder).map((field, index) => (
+                 field.bDisplayed && ( 
                 <DynamicInputFieldHeader
 
                     //api fields
-                    bAllowDateBefore={field.bAllowDateBefore}
-                    bAllowSpecialChar={field.bAllowSpecialChar}
-                    bDisplayed={field.bDisplayed} 
-                    isMandatory={field.bMandatory}
-                    bNegative={field.bNegative}
-                    isDisabled={field.bReadOnly}
+                    bAllowDateBefore={field.bAllowDateBefore}//done
+                    bAllowSpecialChar={field.bAllowSpecialChar}//done for sDatatype text
+                    bDisplayed={field.bDisplayed} //done used here in mapping
+                    isMandatory={field.bMandatory}//done
+                    bNegative={field.bNegative}//done gave to input have sDataType number
+                    isDisabled={field.bReadOnly}//done
 
                     iFieldId={field.iFieldId}
-                    iFieldOrder={field.iFieldOrder}
+                    iFieldOrder={field.iFieldOrder}//done used here in mapping
                     iLinkWithOtherMasters={field.iLinkWithOtherMasters}
                     iMasterId={field.iMasterId}
-                    iMaxSize={field.iMaxLength}
+                    iMaxSize={field.iMaxLength}//done
 
-                    type={field.sType}
-                    sDefaultValue={field.sDefaultValue}
-                    sErrorMsgConditions={field.sErrorMsgConditions}
-                    label={field.sFieldCaption}
-                    key1={field.sFieldName}
-                    sLanguageDisplayedWith={field.sLanguageDisplayedWith}    
-                    sLinkApi={field.sLinkApi}      
+                    type={field.sType}//done
+                    sDefaultValue={field.sDefaultValue}//done but not tested
+                    sErrorMsgConditions={field.sErrorMsgConditions}//done need more error condtions.
+                    label={field.sFieldCaption}//done
+                    key1={field.sFieldName}//done
+                    sLanguageDisplayedWith={field.sLanguageDisplayedWith}//it is difficult with validation like checking special character.    
+                    iLinkTag={field.sLinkApi}//done
                     sTabName={field.sTabName}     
-                    sDatatype={field.sDatatype}
+                    sDatatype={field.sDatatype}//done
 
 
 
@@ -159,11 +171,14 @@ function Header({headerData}) {
                     key={field.sFieldName}
                     formDataHeader={formData}
                     HeaderInputValue={HeaderInputValue}
-                    iLinkTag={field.sLinkApi}
                     isHeader="true"
+                    triggerValidation={triggerValidation}
+                   
+                    onError={handleFieldError}
+
 
                 />
-            ))}
+            )))}
       
       </div>
       

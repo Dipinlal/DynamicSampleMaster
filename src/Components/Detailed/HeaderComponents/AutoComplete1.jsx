@@ -27,40 +27,41 @@ const AutoComplete1 = ({
 }) => {
 
  
-    const CustomListBox = React.forwardRef((props, ref) => {
-        const { children, ...other } = props;
-        let codeReq = false
-        if(AutoMenu && AutoMenu[0].sCode){
-          codeReq = true
-        }
-        return (
-          <ul style={{paddingTop:0}} ref={ref} {...other}>
-            <ListSubheader
-              style={{ backgroundColor: "rgb(140, 153, 224)", padding: "5px" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <Typography style={{ marginRight: "auto" }}>Name</Typography>
-                {codeReq &&
-                <Typography style={{ marginLeft: "auto" }}>Code</Typography>
-                } 
-                </div>
-            </ListSubheader>
-            {children}
-          </ul>
-        );
-      });
+    
 
       const {iId} = useSelector((state)=>state.authState)
 
     const [iTypeF2, setiTypeF2] = useState(1);
     const [AutoMenu, setAutoMenu] = useState([]);
     const [autoSearchKey, setautoSearchKey] = useState("");
+    const [sCodeReq, setsCodeReq] = useState(false)
+
+    const CustomListBox = React.forwardRef((props, ref) => {
+      const { children, ...other } = props;
+     
+    console.log(sCodeReq);
+      return (
+        <ul style={{paddingTop:0}} ref={ref} {...other}>
+          <ListSubheader
+            style={{ backgroundColor: "rgb(140, 153, 224)", padding: "5px" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Typography style={{ marginRight: "auto" }}>Name</Typography>
+              {sCodeReq &&
+              <Typography style={{ marginLeft: "auto" }}>Code</Typography>
+              } 
+              </div>
+          </ListSubheader>
+          {children}
+        </ul>
+      );
+    });
   // Effect to sync state with prop changes
   useEffect(() => {
     setautoSearchKey(formData[sFieldName] || '');
@@ -93,7 +94,7 @@ const AutoComplete1 = ({
               const iUser = iId;
               const iTag = iLinkTag;
               const response = await getAutocomplete(iTag)
-              console.log(response);
+              
               setAutoMenu((JSON.parse(response.data.result)));
             } catch (error) {
               console.log(error);
@@ -103,6 +104,14 @@ const AutoComplete1 = ({
     
       }, [iTypeF2,autoSearchKey]);
   
+      useEffect(() => {
+        
+        if(AutoMenu && AutoMenu[1]?.sCode){
+          setsCodeReq(true)
+        }
+      }, [AutoMenu])
+      
+
   return (
     <Autocomplete
     disabled={disabled}
@@ -181,9 +190,9 @@ const AutoComplete1 = ({
                   // Clear selected option and search key before handling F2 press
                   const updatedFormData = {
                     ...formData,
-                    sProduct:"",
-                    sPCode: "",
-                    iProduct:null,
+                    sName: newValue ? newValue.sName : "",
+                    iId: newValue ? newValue.iId : "",
+                   
                    
                   };
                   setFormData(updatedFormData); 
