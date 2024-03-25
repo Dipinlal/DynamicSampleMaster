@@ -29,6 +29,10 @@ const AutoComplete1 = ({
  
     const CustomListBox = React.forwardRef((props, ref) => {
         const { children, ...other } = props;
+        let codeReq = false
+        if(AutoMenu && AutoMenu[0].sCode){
+          codeReq = true
+        }
         return (
           <ul style={{paddingTop:0}} ref={ref} {...other}>
             <ListSubheader
@@ -42,8 +46,10 @@ const AutoComplete1 = ({
                 }}
               >
                 <Typography style={{ marginRight: "auto" }}>Name</Typography>
+                {codeReq &&
                 <Typography style={{ marginLeft: "auto" }}>Code</Typography>
-              </div>
+                } 
+                </div>
             </ListSubheader>
             {children}
           </ul>
@@ -101,12 +107,12 @@ const AutoComplete1 = ({
     <Autocomplete
     disabled={disabled}
      PaperComponent={({ children }) => (
-      <Paper style={{ width: 'fit-content', minWidth: '150px', maxWidth: '300px'  }}>{children}</Paper>
+      <Paper style={{ minWidth: '150px', maxWidth: '300px'  }}>{children}</Paper>
     )} 
     sx={{height:"35px", marginTop:"0px"}}
       id={autoId}
       options={AutoMenu}
-      getOptionLabel={(option) => option.sName}
+      getOptionLabel={(option) => option && option.sName ? option.sName : ""}
       value={
         AutoMenu.find((option) => option.sName === formData.sName) || null
       }
@@ -114,8 +120,9 @@ const AutoComplete1 = ({
       filterOptions={(options, { inputValue }) => {
         return options.filter(
           (option) =>
-          option.sName.toLowerCase().includes(inputValue.toLowerCase()) ||
-          option.sCode.toLowerCase().includes(inputValue.toLowerCase())
+          option.sName?.toLowerCase().includes(inputValue.toLowerCase()) ||
+          option.sCode?.toLowerCase().includes(inputValue.toLowerCase())
+         
         );
       }}
       onInputChange={(event, newInputValue) => {
@@ -134,9 +141,11 @@ const AutoComplete1 = ({
             <Typography style={{ marginRight: "auto", fontSize: "12px" }}>
               {option.sName}
             </Typography>
+            {option.sCode &&
             <Typography style={{ marginLeft: "auto", fontSize: "12px" }}>
               {option.sCode}
             </Typography>
+            }
           </div>
         </li>
       )}
@@ -146,8 +155,10 @@ const AutoComplete1 = ({
           {...params}
           label={autoLabel}
           // variant="standard"
+          
           InputProps={{
             ...params.InputProps,
+            autoComplete: "off",
             // disableUnderline: true, // Disables the underline on the standard variant
             style: {
               // Overrides default styles
@@ -157,12 +168,13 @@ const AutoComplete1 = ({
               borderRadius: "10px",
               fontSize: "12px",
               height: "35px",
-              paddingLeft: "6px",
+              paddingLeft: "0px",
              
               
             },
             inputProps: {
               ...params.inputProps,
+              autoComplete: 'nope',
               maxLength: iMaxSize,
               onKeyDown: (event) => {
                 if (event.key === "F2") {

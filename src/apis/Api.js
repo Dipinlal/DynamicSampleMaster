@@ -57,8 +57,16 @@ export const Login_Login =async(payload)=>{
 }
 //getMasterFields
 export const getFields = async (payload) => {
-    return makeAuthorizedRequest("get","/MasterField/GetMastersFields",payload);
+  const response = await axios.get(`${BASE_URL}/MasterField/GetMastersFields`)
+  return response;
+   // return makeAuthorizedRequest("get","/MasterField/GetMastersFields",payload);
 };
-export const getAutocomplete = async (itag,payload) => {
-    return makeAuthorizedRequest("get",itag,payload);
+export const getAutocomplete = async (itag) => {
+    // return makeAuthorizedRequest("get",itag);
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`, // Corrected
+    };
+    const response = await axios.get(`${BASE_URL}${itag}`,headers)
+    return response;
 };

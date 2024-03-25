@@ -53,7 +53,13 @@ function Detailed() {
          const response = await getFields()
             
        console.log(response);
+       if(response.data.result){
         setheaderData(JSON.parse(response.data.result))   
+       }
+       else{
+        setheaderData([])
+       }
+        
           
           } catch (error) {
             console.log(error);
@@ -63,7 +69,7 @@ function Detailed() {
           fetchData();
         
       
-      }, [iDocType]);
+      }, []);
       //get details
       useEffect(() => {
         const fetchData = async () => {

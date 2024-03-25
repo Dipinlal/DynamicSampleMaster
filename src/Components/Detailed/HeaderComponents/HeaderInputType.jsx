@@ -53,7 +53,7 @@ const DynamicInputFieldHeader = ({key1, type, HeaderInputValue, isMandatory, isD
               borderRadius: "10px",
               fontSize: "12px",
               height: "35px",
-              paddingLeft: "6px",
+              paddingLeft: "0px",
               textAlign: "center",
             },
             inputProps: {
