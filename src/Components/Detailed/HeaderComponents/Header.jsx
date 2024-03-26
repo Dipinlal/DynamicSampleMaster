@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import DynamicInputFieldHeader from './HeaderInputType'
 
-function Header({headerData,triggerValidation,handleFieldError,headerFormData,setheaderFormData}) {
+function Header({headerData,triggerValidation,resetTriggerVAlidation,handleFieldError,headerFormData,setheaderFormData}) {
 
     
    
@@ -173,7 +173,7 @@ function Header({headerData,triggerValidation,handleFieldError,headerFormData,se
                     HeaderInputValue={HeaderInputValue}
                     isHeader="true"
                     triggerValidation={triggerValidation}
-                   
+                    resetTriggerVAlidation={resetTriggerVAlidation}
                     onError={handleFieldError}
 
 

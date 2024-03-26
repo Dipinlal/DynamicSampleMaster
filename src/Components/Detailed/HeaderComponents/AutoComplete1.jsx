@@ -39,7 +39,7 @@ const AutoComplete1 = ({
     const CustomListBox = React.forwardRef((props, ref) => {
       const { children, ...other } = props;
      
-    console.log(sCodeReq);
+   
       return (
         <ul style={{paddingTop:0}} ref={ref} {...other}>
           <ListSubheader
@@ -70,11 +70,12 @@ const AutoComplete1 = ({
     const handleAutocompleteChange = (event, newValue) => {
         const updatedFormData = {
           ...formData,
-          sName: newValue ? newValue.sName : "",
-          iId: newValue ? newValue.iId : "",
+          sName: newValue ? newValue.sName : null,//"" was replaced by null
+          iId: newValue ? newValue.iId : null,//"" was replaced by null
          
          
         };
+        console.log(updatedFormData);
         setFormData(updatedFormData); // This will now update the parent's state
         setiTypeF2(1)
       };
@@ -94,7 +95,7 @@ const AutoComplete1 = ({
               const iUser = iId;
               const iTag = iLinkTag;
               const response = await getAutocomplete(iTag)
-              
+              if(response?.data?.result)
               setAutoMenu((JSON.parse(response.data.result)));
             } catch (error) {
               console.log(error);
@@ -190,8 +191,8 @@ const AutoComplete1 = ({
                   // Clear selected option and search key before handling F2 press
                   const updatedFormData = {
                     ...formData,
-                    sName: newValue ? newValue.sName : "",
-                    iId: newValue ? newValue.iId : "",
+                    sName: newValue ? newValue?.sName : "",
+                    iId: newValue ? newValue?.iId : "",
                    
                    
                   };

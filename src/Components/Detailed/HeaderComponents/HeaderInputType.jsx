@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import AutoComplete1 from './AutoComplete1';
 import { TextField } from '@mui/material';
 import CustomSelect1 from './Select1';
+import CheckBox from './CheckBox/CheckBox';
 
 
 
 
 const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,key1, type, HeaderInputValue, isMandatory, isDisabled,formDataHeader,label,iMaxSize,iLinkTag,isHeader,sDatatype,sDefaultValue,sErrorMsgConditions,
-  triggerValidation,onError
+  triggerValidation,resetTriggerVAlidation,onError
 }) => {
 
     const [value, setValue] = useState('');
     const [autoCompleteData, setAutoCompleteData] = useState({})//forAucomplete only
     const [dateValue, setDateValue] = useState('');
     const [isError, setError] = useState(false);
+    const [checkBoxData, setcheckBoxData] = useState({})
+ 
     
     const handleError = (errorMessage) => {
       setError(errorMessage);
@@ -162,26 +165,39 @@ const doesDateExist = (dateStr) => {
         const val=autoCompleteData.iId
         HeaderInputValue(key1,val)
       }
-     
+      else{
+        HeaderInputValue(key1,0)
+        
+      }
 
 
     }, [autoCompleteData])
     useEffect(() => {
-      if(sDefaultValue){
-        HeaderInputValue(key1,sDefaultValue)
-      }
      
-  }, [sDefaultValue]);
+      if(checkBoxData){
+        
+        HeaderInputValue(key1,checkBoxData[key1])
+      }
+      else{
+        HeaderInputValue(key1,"")
+        
+      }
+
+
+    }, [checkBoxData])
+  
 
   
   useEffect(()=>{
     if(triggerValidation){
       validateField()
-      
+      resetTriggerVAlidation()
     }
    
   },[triggerValidation])
-   
+
+
+ 
     switch (type) {
       case "Input":
         return (
@@ -257,23 +273,6 @@ const doesDateExist = (dateStr) => {
         />
         
         );
-        // case "Autocomplete":
-        //   return (
-        //     <CustomSelect1
-        //       formData={formData}
-        //       setFormData={setformData}
-        //       width="92%"
-        //       autoId="BoardSearch"
-        //       autoLabel={isHeader === "true" ? label : null}
-        //       isMandatory={isMandatory}
-        //       disabled={isDisabled === 1 ? true : false}
-        //       iMaxSize={iMaxSize}
-        //       iLinkTag={iLinkTag}
-        //       isHeader={isHeader}
-        //       sFieldName={key1}
-
-        //     />
-        //   );  
         
         case "Autocomplete":
           return (
@@ -289,13 +288,26 @@ const doesDateExist = (dateStr) => {
               iLinkTag={iLinkTag}
               isHeader={isHeader}
               sFieldName={key1}
+              
 
             />
           );  
+
+        case "CheckBox":
+          return(
+            <CheckBox
+            iLinkTag={iLinkTag}
+            sFieldName={key1}
+            label={label}
+            isMandatory={isMandatory}
+            checkBoxData={checkBoxData}
+            setcheckBoxData={setcheckBoxData}
+            />
+          )
       
           
       default:
-        return <p>Invalid input type</p>;
+        return null;
     }
 };
 

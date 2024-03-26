@@ -13,9 +13,9 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import "./detailed.css"
 import Header from "./HeaderComponents/Header";
 import Body from "./BodyComponents/Body";
-import { getFields, postEmployee } from "../../apis/Api";
 import AlertBox from "../AlertBox/AlertBox"
 import { Savings } from "@mui/icons-material";
+import { getFields, postEmployee } from "../../Apis/Api";
 
 function Detailed() {
 
@@ -32,7 +32,7 @@ function Detailed() {
   const [headerFormData, setheaderFormData] = useState([])
   const [saving, setsaving] = useState(false)
 
-console.log(headerFormData);
+
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -67,7 +67,8 @@ console.log(headerFormData);
             
        
        if(response.data.result){
-        setheaderData(JSON.parse(response.data.result))   
+        setheaderData(JSON.parse(response.data.result)) 
+         console.log(JSON.parse(response.data.result));
        }
        else{
         setheaderData([])
@@ -154,62 +155,61 @@ console.log(headerFormData);
     setsaveValidation(true)
     setsaving(true)
   }
+  const validateAndUpdateFormData = () => {
+    let updatedFormData = { ...headerFormData }; // Make a copy to avoid direct state mutation
+    Object.keys(headerFormData).forEach((formDataKey) => {
+      const matchingField = headerData.find((field) => field.sFieldName === formDataKey);
+      if (matchingField && matchingField.sDatatype === "number" && !headerFormData[formDataKey]) {
+        updatedFormData[formDataKey] = 0; // Set default value if datatype is number and value is falsy
+      }
+    });
+    return updatedFormData;
+  };
+  
   useEffect(() => {
     const handleSave = async () => {
       // Ensure there are no errors before proceeding with the save
       const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
-      if (errorsArray.length === 0 && saving) {
+      if (errorsArray.length === 0 && saving &&!saveValidation) {
         try {
           // Proceed with the saving logic here
           // Your existing save logic
           console.log("Saving data:", headerFormData);
-          const employeeData ={
-        
-            "id": 0,
-            "name": headerFormData.sName,
-            "dob": headerFormData.dDob,
-            "address": headerFormData.sAddress,
-            "cityId": headerFormData.iId,
-            "countryId":headerFormData.iId,
-            "pinCode": headerFormData.iPinCode,
-            "dateofJoining": headerFormData.dDateofJoining,
-            "departmentId": headerFormData.iDepartmentId,
-            "previousSalary": headerFormData.nPreviousSalary,
-            "currentSalary": headerFormData.nCurrentSalary
+          const updatedHeaderFormData = validateAndUpdateFormData();
+          console.log(updatedHeaderFormData);
+        // const response = await postEmployee(headerFormData)
           
-        }
-        const response = await postEmployee(employeeData)
-          console.log(response.data.message);
-          if(response.status === 200){
-            setAlertMessage(response.data.message);
-            setShowAlert(true);
-            setalertcolor("#28a745")//green
+        //   if(response.status === 200){
+        //     setAlertMessage(response.data.message);
+        //     setShowAlert(true);
+        //     setalertcolor("#28a745")//green
          
            
         
-            setTimeout(() => {
-              setShowAlert(false);
+        //     setTimeout(() => {
+        //       setShowAlert(false);
               
         
-            }, 1000);
-           }
-           else{
-            setAlertMessage(response.data.message);
-            setShowAlert(true);
-            setalertcolor("#ffcc00")//yellow
+        //     }, 1000);
+        //    }
+        //    else{
+        //     setAlertMessage(response.data.message);
+        //     setShowAlert(true);
+        //     setalertcolor("#ffcc00")//yellow
         
             
-            setTimeout(() => {
-              setShowAlert(false);
-              // navigate('/Home')
+        //     setTimeout(() => {
+        //       setShowAlert(false);
+        //       // navigate('/Home')
         
-            }, 1000);
-           }
+        //     }, 1000);
+        //    }
           // Handle successful save (e.g., show success message, navigate away, etc.)
           setsaving(false); // Reset saving state
         } catch (error) {
           console.log(error);
-          console.log(error.response.data.errors.employee[0]);
+          setsaving(false);
+         
           if (error.response && error.response.status) {
             switch (error.response.status) {
               case 400://bad request
@@ -310,8 +310,8 @@ console.log(headerFormData);
     };
   
     handleSave();
-  }, [fieldErrors, saving]); // Depend on fieldErrors and saving
-  
+  }, [fieldErrors, saving,saveValidation]); // Depend on fieldErrors and saving
+
   // useEffect(()=>{
   
   //     const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
@@ -411,7 +411,7 @@ console.log(headerFormData);
         
         
       </div>
-      <Header headerData={headerData} triggerValidation={saveValidation}  handleFieldError={handleFieldError} 
+      <Header headerData={headerData} triggerValidation={saveValidation} resetTriggerVAlidation={resetSavevalidation}  handleFieldError={handleFieldError} 
   resetFieldErrors={resetFieldErrors} headerFormData={headerFormData} setheaderFormData={setheaderFormData}
     />
      
