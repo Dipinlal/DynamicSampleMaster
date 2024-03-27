@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import AutoComplete from './AutoComplete';
 import AutoComplete1 from './AutoComplete1';
 import { TextField } from '@mui/material';
 import CustomSelect1 from './Select1';
@@ -18,6 +19,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     const [isError, setError] = useState(false);
     const [checkBoxData, setcheckBoxData] = useState({})
     const [radioValue, setradioValue] = useState(null)
+ 
  
     
     const handleError = (errorMessage) => {
@@ -106,11 +108,11 @@ const doesDateExist = (dateStr) => {
       let error = "";
       
       if (sDatatype === "date") {
-        if (!doesDateExist(dateValue)) {
+        if (!doesDateExist(formDataHeader[key1])) {//added  formDataHeader[key1]) instead of datevalue
           error = "Invalid date";
         } else if (bAllowDateBefore !== null) {
               const today = new Date();
-              const selectedDate = new Date(dateValue);
+              const selectedDate = new Date(formDataHeader[key1]);//added  formDataHeader[key1]) instead of datevalue
               today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
 
               // If dates before today are not allowed and the selected date is in the past
@@ -149,7 +151,7 @@ const doesDateExist = (dateStr) => {
         
     }
     
-      if (["When empty", "When Empty"].includes(sErrorMsgConditions) && formDataHeader[key1] == "") {
+      if (["When empty", "When Empty"].includes(sErrorMsgConditions) && (formDataHeader[key1] == "" ||formDataHeader[key1] == undefined)) {
           error = "Can't be empty";
       }
 
@@ -303,6 +305,8 @@ const doesDateExist = (dateStr) => {
               iLinkTag={iLinkTag}
               isHeader={isHeader}
               sFieldName={key1}
+              formDataHeader={formDataHeader}
+              key1={key1}
               
 
             />

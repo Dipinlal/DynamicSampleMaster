@@ -9,7 +9,7 @@ import { getAutocomplete, getAutocomplete1 } from '../../../Apis/Api';
 
 
 
-const AutoComplete1 = ({
+const AutoComplete = ({
  
   formData,
   setFormData,
@@ -84,49 +84,57 @@ const AutoComplete1 = ({
       ;
 
       //get AutoMenu
+      const fetchData = async ({F2}) => {
+        try {
+          const config = {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
+          const formDataiType =F2
+          const iUser = iId;
+          const iTag = iLinkTag;
+          const response = await getAutocomplete(formDataiType,autoSearchKey)
+         
+          if(response?.data?.ResultData)
+          setAutoMenu((JSON.parse(response.data.ResultData)));
+        } catch (error) {
+          console.log(error);
+        }
+      };
       useEffect(() => {
        
-          const fetchData = async () => {
-            try {
-              const config = {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              };
-              const formDataiType =iTypeF2
-              const iUser = iId;
-              const iTag = iLinkTag;
-              const response = await getAutocomplete1(iTag)
-              if(response?.data?.result)
-              setAutoMenu((JSON.parse(response.data.result)));
-            } catch (error) {
-              console.log(error);
-            }
-          };
-          fetchData();
+          
+          fetchData({F2:iTypeF2});
     
       }, [iTypeF2,autoSearchKey]);
-  
+ 
       useEffect(() => {
         
         if(AutoMenu && AutoMenu[1]?.sCode){
           setsCodeReq(true)
         }
-      }, [AutoMenu])
-      useEffect(() => {//for edit case
-        console.log(formDataHeader[key1]);
         const matchingItem = AutoMenu.find(item => item.iId.toString() === formDataHeader[key1]?.toString());
+        
         if (matchingItem) {
           setFormData({
             ...formData,
             sName: matchingItem.sName,
             sCode: matchingItem.sCode,
             iId: matchingItem.iId,
-            [sFieldName]: matchingItem.iId // assuming sFieldName is the field to store the iId
+            // [sFieldName]: matchingItem.iId // assuming sFieldName is the field to store the iId
           });
         }
-      }, [formDataHeader[key1],AutoMenu])
-      
+      }, [AutoMenu])
+      useEffect(() => {
+        
+        const matchingItem = AutoMenu.find(item => item.iId.toString() === formDataHeader[key1]?.toString());
+        
+        if(!matchingItem && formDataHeader[key1]>0){console.log("hi");
+          fetchData({F2:3});
+        }
+      }, [formDataHeader[key1]])
+      console.log(AutoMenu,key1);
 
   return (
     <Autocomplete
@@ -150,7 +158,7 @@ const AutoComplete1 = ({
          
         );
       }}
-      onInputChange={(newInputValue, reason) => {
+      onInputChange={(event,newInputValue, reason) => {
         if (reason === 'input') { // Check if the change is due to user input
           setautoSearchKey(newInputValue);
           // You might need to update formData here to reflect the change
@@ -287,4 +295,4 @@ const AutoComplete1 = ({
   );
 };
 
-export default AutoComplete1;
+export default AutoComplete;

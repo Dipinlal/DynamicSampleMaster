@@ -124,7 +124,16 @@ export const getFields = async (payload) => {
   return response;
    // return makeAuthorizedRequest("get","/MasterField/GetMastersFields",payload);
 };
-export const getAutocomplete = async (itag) => {
+export const getAutocomplete = async (formDataiType,productSearchkey) => {
+  //return makeAuthorizedRequest("get",itag);
+  const headers = {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`, // Corrected
+  };
+  const response = await axios.get(`http://103.120.178.195/maxapi/MaxAccount/GetTradeProduct?iType=${formDataiType}&Search=${productSearchkey}`,headers)
+  return response;
+};
+export const getAutocomplete1 = async (itag) => {
     //return makeAuthorizedRequest("get",itag);
     const headers = {
       "Content-Type": "application/json",
@@ -133,6 +142,7 @@ export const getAutocomplete = async (itag) => {
     const response = await axios.get(`${BASE_URL}${itag}`,headers)
     return response;
 };
+
 
 export const postEmployee = async (payload) => {
  

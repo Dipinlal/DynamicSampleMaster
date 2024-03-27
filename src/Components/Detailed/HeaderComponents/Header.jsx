@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import DynamicInputFieldHeader from './HeaderInputType'
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 function Header({headerData,triggerValidation,resetTriggerVAlidation,handleFieldError,headerFormData,setheaderFormData}) {
 
@@ -7,7 +9,35 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
    
     const [selectedHeaderMain, setselectedHeaderMain] = useState("Main")
     const [formData, setformData] = useState(headerFormData)
-    
+    const [tabValue, setTabValue] = useState(0);
+    const [tabsWithFields, setTabsWithFields] = useState({});
+    const [activeTab, setActiveTab] = useState(0);
+    const [tabNames, setTabNames] = useState([]);
+    const [tabData, settabData] = useState([])
+   
+  
+   
+    useEffect(() => {
+      const groupedData = headerData
+        .filter((field) => field.bDisplayed) // Consider only displayed fields
+        .sort((a, b) => a.iFieldOrder - b.iFieldOrder) // Sort by field order
+        .reduce((acc, field) => {
+          // Group fields by sTabName
+          const tabName = field.sTabName || 'Default'; // Handle fields with no sTabName
+          if (!acc[tabName]) {
+            acc[tabName] = [];
+          }
+          acc[tabName].push(field);
+          return acc;
+        }, {});
+  
+      setTabNames(Object.keys(groupedData)); // Set tab names for rendering tabs
+      settabData(groupedData); // Set sorted and grouped fields for display
+    }, [headerData]);
+    const handleTabChange = (event, newValue) => {
+      setActiveTab(newValue);
+    };
+  
 
     const fixedFields = [{
       sFieldName:"sDocNo",
@@ -79,8 +109,15 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
     useEffect(() => {
       if (headerData && Array.isArray(headerData)) {
           const newFormData = headerData.reduce((acc, curr) => {
+            const existingValue = formData[curr.sFieldName];
               if (curr.sFieldName) {
-                  acc[curr.sFieldName] = "";
+                if (existingValue !== undefined) {
+                  // If there's an existing value, preserve it
+                  acc[curr.sFieldName] = existingValue;
+              } else {
+                  // Initialize field based on its data type
+                  acc[curr.sFieldName] = curr.sDataType === 'number' ? 0 : "";
+              }
               }
               return acc;
           }, {});
@@ -114,9 +151,14 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
       <div onClick={()=>headerSelection("Attachments")} className={selectedHeaderMain === "Attachments"?"CLTCS2D1D1":"CLTCS2D1D2"}>Attachments</div>
 
     </div> */}
+    <Tabs value={activeTab} onChange={handleTabChange}>
+        {tabNames.map((tabName, index) => (
+          <Tab label={tabName} value={index} key={tabName} />
+        ))}
+      </Tabs>
     {
       selectedHeaderMain ==="Main" &&
-      <div className="headInput-container">
+      <div>
 
         {/* {
           fixedFields.map((field)=>(
@@ -136,9 +178,16 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
                 />
           ))
         } */}
-       
-      { headerData.sort((a, b) => a.iFieldOrder - b.iFieldOrder).map((field, index) => (
-                 field.bDisplayed && ( 
+         {tabNames.map((tabName, index) => (
+        <div
+          key={tabName}
+          role="tabpanel"
+          hidden={activeTab !== index}
+          id={`tabpanel-${index}`}
+          aria-labelledby={`tab-${index}`}
+          className="headInput-container"
+        >
+          {tabData[tabName] && activeTab === index && tabData[tabName].map((field) => (
                 <DynamicInputFieldHeader
 
                     //api fields
@@ -178,8 +227,9 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
 
 
                 />
-            )))}
-      
+                ))}
+                </div>
+              ))}
       </div>
       
     }

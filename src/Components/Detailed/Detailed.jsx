@@ -29,7 +29,9 @@ function Detailed() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertcolor, setalertcolor] = useState("#000000")
   const [fieldErrors, setFieldErrors] = useState({});
-  const [headerFormData, setheaderFormData] = useState([])
+  const [headerFormData, setheaderFormData] = useState({
+    name:"Edit",cityId:"9"
+  })
   const [saving, setsaving] = useState(false)
 
 
@@ -68,7 +70,7 @@ function Detailed() {
        
        if(response.data.result){
         setheaderData(JSON.parse(response.data.result)) 
-         console.log(JSON.parse(response.data.result));
+         
        }
        else{
         setheaderData([])
@@ -165,7 +167,7 @@ function Detailed() {
     });
     return updatedFormData;
   };
-  
+  console.log("Saving data:", headerFormData);
   useEffect(() => {
     const handleSave = async () => {
       // Ensure there are no errors before proceeding with the save
@@ -174,9 +176,9 @@ function Detailed() {
         try {
           // Proceed with the saving logic here
           // Your existing save logic
-          console.log("Saving data:", headerFormData);
+          
           const updatedHeaderFormData = validateAndUpdateFormData();
-          console.log(updatedHeaderFormData);
+          
         // const response = await postEmployee(headerFormData)
           
         //   if(response.status === 200){

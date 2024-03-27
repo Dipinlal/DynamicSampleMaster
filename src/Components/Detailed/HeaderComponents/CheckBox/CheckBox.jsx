@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import "./checkbox.css"
 import SearchBox from './SearchBox';
-import { getAutocomplete } from '../../../../Apis/Api';
+import { getAutocomplete1 } from '../../../../Apis/Api';
 import { Typography } from '@mui/material';
 
 function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBoxData}) {
@@ -47,7 +47,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
         const fetchData = async () => {
           try {
             const iTag = iLinkTag;
-            const response = await getAutocomplete(iTag)
+            const response = await getAutocomplete1(iTag)
             const resultData = JSON.parse(response.data.result)
             if(resultData.length>0){
             

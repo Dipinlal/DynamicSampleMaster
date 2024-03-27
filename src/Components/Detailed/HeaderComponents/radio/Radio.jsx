@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { getAutocomplete } from '../../../../Apis/Api';
+import { getAutocomplete1 } from '../../../../Apis/Api';
 import { Typography } from '@mui/material';
 import "./radiocss.css"
 
@@ -25,7 +25,7 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue})
         const fetchData = async () => {
           try {
             const iTag = iLinkTag;
-            const response = await getAutocomplete(iTag)
+            const response = await getAutocomplete1(iTag)
             const resultData = JSON.parse(response.data.result)
             if(resultData.length>0){
             
