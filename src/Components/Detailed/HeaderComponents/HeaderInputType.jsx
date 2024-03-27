@@ -308,7 +308,7 @@ const doesDateExist = (dateStr) => {
             />
           );  
 
-        case "CheckBox":
+        case "CheckBoxes":
           return(
             <CheckBox
             iLinkTag={iLinkTag}

@@ -75,7 +75,7 @@ const AutoComplete1 = ({
          
          
         };
-        console.log(updatedFormData);
+        
         setFormData(updatedFormData); // This will now update the parent's state
         setiTypeF2(1)
       };
@@ -135,8 +135,15 @@ const AutoComplete1 = ({
          
         );
       }}
-      onInputChange={(event, newInputValue) => {
-        setautoSearchKey(newInputValue);
+      onInputChange={(newInputValue, reason) => {
+        if (reason === 'input') { // Check if the change is due to user input
+          setautoSearchKey(newInputValue);
+          // You might need to update formData here to reflect the change
+          setFormData({
+            ...formData,
+            [sFieldName]: newInputValue, // Assuming you want to track the display value in formData
+          });
+        }
       }}
       renderOption={(props, option) => (
         <li {...props}>
