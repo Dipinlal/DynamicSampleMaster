@@ -3,6 +3,7 @@ import AutoComplete1 from './AutoComplete1';
 import { TextField } from '@mui/material';
 import CustomSelect1 from './Select1';
 import CheckBox from './CheckBox/CheckBox';
+import Radio from './radio/Radio';
 
 
 
@@ -16,6 +17,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     const [dateValue, setDateValue] = useState('');
     const [isError, setError] = useState(false);
     const [checkBoxData, setcheckBoxData] = useState({})
+    const [radioValue, setradioValue] = useState(null)
  
     
     const handleError = (errorMessage) => {
@@ -185,6 +187,19 @@ const doesDateExist = (dateStr) => {
 
 
     }, [checkBoxData])
+    useEffect(() => {
+     
+      if(radioValue){
+        
+        HeaderInputValue(key1,radioValue[key1])
+      }
+      else{
+        HeaderInputValue(key1,0)
+        
+      }
+
+
+    }, [radioValue])
   
 
   
@@ -304,7 +319,17 @@ const doesDateExist = (dateStr) => {
             setcheckBoxData={setcheckBoxData}
             />
           )
-      
+      case "Radio":
+        return(
+          <Radio
+          iLinkTag={iLinkTag}
+          sFieldName={key1}
+          label={label}
+          isMandatory={isMandatory}
+          radioValue={radioValue}
+          setradioValue={setradioValue}
+          />
+        )
           
       default:
         return null;
