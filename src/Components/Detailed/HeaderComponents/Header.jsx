@@ -14,9 +14,9 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
     const [activeTab, setActiveTab] = useState(0);
     const [tabNames, setTabNames] = useState([]);
     const [tabData, settabData] = useState([])
-   
+    
   
-   
+    
     useEffect(() => {
       const groupedData = headerData
         .filter((field) => field.bDisplayed) // Consider only displayed fields
@@ -130,6 +130,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
     }
 
     const HeaderInputValue = (key,value)=>{
+      
         setformData({
             ...formData,
             [key]:value

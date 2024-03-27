@@ -4,11 +4,11 @@ import SearchBox from './SearchBox';
 import { getAutocomplete1 } from '../../../../Apis/Api';
 import { Typography } from '@mui/material';
 
-function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBoxData}) {
+function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBoxData,formDataHeader,key1,disabled}) {
 
     const [formData, setformData] = useState({})
     const [companyList, setcompanyList] = useState([]);
-    const [companyListExist, setCompanyListExist] = useState([]);
+    const [companyListExist, setCompanyListExist] = useState(formDataHeader[key1]);
     const [changesTriggered, setchangesTriggered] = useState(false);
     const handleSelectedIds = useCallback(
         (selectedIds, params, selectedTitles) => {
@@ -19,7 +19,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
         },
         []
       );
-
+      
       useEffect(() => {
         setcheckBoxData(formData)
       }, [formData])
@@ -37,7 +37,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
             changeTriggered={changesTriggered}
             setchangesTriggered={resetChangesTrigger}
             initialCheckedIds={companyListExist}
-            //disabled={formData?.iApprove === 1}
+            disabled={disabled}
           />
         ),
         [companyList, handleSelectedIds, changesTriggered, companyListExist]

@@ -70,7 +70,7 @@ function Detailed() {
        
        if(response.data.result){
         setheaderData(JSON.parse(response.data.result)) 
-         
+         console.log(JSON.parse(response.data.result));
        }
        else{
         setheaderData([])

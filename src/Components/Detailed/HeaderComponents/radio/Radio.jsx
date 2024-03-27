@@ -3,15 +3,14 @@ import { getAutocomplete1 } from '../../../../Apis/Api';
 import { Typography } from '@mui/material';
 import "./radiocss.css"
 
-function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue}) {
+function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,formDataHeader,key1,disabled}) {
 
-    const [formData, setformData] = useState({})
+    const [formData, setformData] = useState(formDataHeader)
     const [companyList, setcompanyList] = useState([]);
-    const [companyListExist, setCompanyListExist] = useState([]);
     const [changesTriggered, setchangesTriggered] = useState(false);
-    const [selectedCompanyId, setSelectedCompanyId] = useState(0);
+    const [selectedCompanyId, setSelectedCompanyId] = useState(formDataHeader[key1]);
     
-
+    
       useEffect(() => {
         setradioValue(formData)
       }, [formData])
@@ -85,9 +84,10 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue})
                                         <input
                                             type="radio"
                                             name={sFieldName}
-                                            value={company.iId}
+                                            value={company?.iId}
                                             checked={selectedCompanyId === company.iId}
                                             onChange={handleRadioChange}
+                                            disabled={disabled}
                                         />
                                         {company.title}
                                     </label>

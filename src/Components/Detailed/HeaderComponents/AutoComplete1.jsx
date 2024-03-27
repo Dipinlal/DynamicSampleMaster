@@ -114,7 +114,7 @@ const AutoComplete1 = ({
         }
       }, [AutoMenu])
       useEffect(() => {//for edit case
-        console.log(formDataHeader[key1]);
+        
         const matchingItem = AutoMenu.find(item => item.iId.toString() === formDataHeader[key1]?.toString());
         if (matchingItem) {
           setFormData({

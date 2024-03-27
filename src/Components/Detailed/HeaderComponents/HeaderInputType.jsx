@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import AutoComplete from './AutoComplete';
 import AutoComplete1 from './AutoComplete1';
-import { TextField } from '@mui/material';
+import { Checkbox, FormControlLabel, TextField } from '@mui/material';
 import CustomSelect1 from './Select1';
 import CheckBox from './CheckBox/CheckBox';
 import Radio from './radio/Radio';
@@ -19,8 +19,10 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     const [isError, setError] = useState(false);
     const [checkBoxData, setcheckBoxData] = useState({})
     const [radioValue, setradioValue] = useState(null)
+    const [checkedItems, setCheckedItems] = useState(formDataHeader[key1]);
  
  
+  
     
     const handleError = (errorMessage) => {
       setError(errorMessage);
@@ -165,41 +167,43 @@ const doesDateExist = (dateStr) => {
 
     useEffect(() => {
      
-      if(autoCompleteData && autoCompleteData?.iId){
+      if(autoCompleteData && type ==="Autocomplete"){
+      if(autoCompleteData?.iId){
         const val=autoCompleteData.iId
         HeaderInputValue(key1,val)
       }
       else{
-        HeaderInputValue(key1,0)
+        HeaderInputValue(key1,0);
+        
         
       }
-
+     }
 
     }, [autoCompleteData])
     useEffect(() => {
      
-      if(checkBoxData){
-        
+      if(type ==="CheckBoxes"){
+        if(checkBoxData){
         HeaderInputValue(key1,checkBoxData[key1])
       }
       else{
         HeaderInputValue(key1,"")
         
       }
-
+     }
 
     }, [checkBoxData])
     useEffect(() => {
      
-      if(radioValue){
-        
+      if(type ==="Radio"){
+        if(radioValue){
         HeaderInputValue(key1,radioValue[key1])
       }
       else{
         HeaderInputValue(key1,0)
         
       }
-
+    }
 
     }, [radioValue])
   
@@ -212,7 +216,15 @@ const doesDateExist = (dateStr) => {
     }
    
   },[triggerValidation])
-
+  const handleItemToggle = (e) => {
+    const itemName = e.target.name; // Using the name attribute to identify the checkbox
+    const isChecked = e.target.checked ? 1 : 0; // The checked status of the checkbox
+    setCheckedItems({
+        ...checkedItems,
+        [itemName]: isChecked, // Update the state with the new checked status
+    });
+    HeaderInputValue(key1,isChecked)
+}
 
  
     switch (type) {
@@ -300,7 +312,7 @@ const doesDateExist = (dateStr) => {
               autoId="BoardSearch"
               autoLabel={isHeader === "true" ? label : null}
               isMandatory={isMandatory}
-              disabled={isDisabled === 1 ? true : false}
+              disabled={isDisabled}
               iMaxSize={iMaxSize}
               iLinkTag={iLinkTag}
               isHeader={isHeader}
@@ -321,6 +333,9 @@ const doesDateExist = (dateStr) => {
             isMandatory={isMandatory}
             checkBoxData={checkBoxData}
             setcheckBoxData={setcheckBoxData}
+            formDataHeader={formDataHeader}
+            key1={key1}
+            disabled={isDisabled}
             />
           )
       case "Radio":
@@ -332,7 +347,31 @@ const doesDateExist = (dateStr) => {
           isMandatory={isMandatory}
           radioValue={radioValue}
           setradioValue={setradioValue}
+          formDataHeader={formDataHeader}
+          key1={key1}
+          disabled={isDisabled}
           />
+        )
+        case "CheckBox":
+        return(
+          <FormControlLabel
+          control={
+            <Checkbox
+             checked={formDataHeader[key1] === 1} // Using !! to ensure it's always a boolean
+             onChange={handleItemToggle}
+             disabled={isDisabled}
+             name={key1}
+             
+
+             
+            />
+          }
+          label={
+            <span style={{ fontSize: "12px", padding: "0px" }}>
+             {label}
+            </span>
+          }
+        />
         )
           
       default:

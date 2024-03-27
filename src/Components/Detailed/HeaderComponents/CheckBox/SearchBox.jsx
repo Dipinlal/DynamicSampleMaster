@@ -29,7 +29,7 @@ const Item = styled("div")`
   }
 `;
 
-const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,changeTriggered,setchangesTriggered,initialCheckedIds = [],}) => {
+const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,changeTriggered,setchangesTriggered,initialCheckedIds = [],disabled}) => {
 
   
   
@@ -44,7 +44,7 @@ const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,
 
   //give filtereditems instead of initialitem if select all needed to check all filtereditems only
    const handleSelectAll = () => {
-    
+    if (!disabled) {
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       for (const item of initialItems) {
@@ -53,15 +53,17 @@ const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,
       return updatedItems;
     });
     setSelectAll(!selectAll);
-    
+    }
   };
   
   const handleItemToggle = (iId) => {
+    if (!disabled) {
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       updatedItems[iId] = !prevItems[iId];
       return updatedItems;
     });
+    }
   }
 
 
@@ -127,8 +129,9 @@ useEffect(() => {
             id="IpWSB"
             value={searchTerm}
             onChange={(e) => {setSearchTerm(e.target.value)}}
+            disabled={disabled}
           />
-          <IconButton>
+          <IconButton disabled={disabled}>
             <SearchIcon id="searchIconSB" />
           </IconButton>
         </div>
@@ -143,6 +146,7 @@ useEffect(() => {
               checked={selectAll}
               onChange={handleSelectAll}
               style={{ marginLeft: !search ? "5vw" : "3vw" }}
+              disabled={disabled}
             />
           }
           label={
@@ -160,6 +164,7 @@ useEffect(() => {
                 <Checkbox
                 checked={!!items[item.iId]} // Using !! to ensure it's always a boolean
                 onChange={() => handleItemToggle(item.iId)}
+                disabled={disabled}
                 />
               }
               label={
@@ -175,6 +180,7 @@ useEffect(() => {
           onClick={() => {
             setDisplayLimit((prevLimit) => prevLimit + 50); // Increase the display limit
              // Display the next set of items
+             disabled={disabled}
           }}
         >
           +
