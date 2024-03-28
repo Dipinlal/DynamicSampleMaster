@@ -30,7 +30,7 @@ function Detailed() {
   const [alertcolor, setalertcolor] = useState("#000000")
   const [fieldErrors, setFieldErrors] = useState({});
   const [headerFormData, setheaderFormData] = useState({
-    name:"Edit",cityId:"9"
+    name:"Edit",cityId:"9",departmentCheck:"1,2,3,4"
   })
   const [saving, setsaving] = useState(false)
 

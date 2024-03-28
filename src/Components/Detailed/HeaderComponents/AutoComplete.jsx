@@ -126,15 +126,15 @@ const AutoComplete = ({
           });
         }
       }, [AutoMenu])
-      useEffect(() => {
+      // useEffect(() => {
         
-        const matchingItem = AutoMenu.find(item => item.iId.toString() === formDataHeader[key1]?.toString());
+      //   const matchingItem = AutoMenu.find(item => item.iId.toString() === formDataHeader[key1]?.toString());
         
-        if(!matchingItem && formDataHeader[key1]>0){console.log("hi");
-          fetchData({F2:3});
-        }
-      }, [formDataHeader[key1]])
-      console.log(AutoMenu,key1);
+      //   if(!matchingItem && formDataHeader[key1]>0){
+      //     fetchData({F2:3});
+      //   }
+      // }, [formDataHeader[key1]])
+      
 
   return (
     <Autocomplete
