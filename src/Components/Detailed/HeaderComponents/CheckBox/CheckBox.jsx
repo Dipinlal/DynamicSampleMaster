@@ -48,13 +48,13 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
           try {
             const iTag = iLinkTag;
             const response = await getAutocomplete1(iTag)
-            const resultData = JSON.parse(response.data.result)
+            const resultData = JSON.parse(response.result)
             if(resultData.length>0){
             
               
                 const formattedData = resultData.map((item) => ({
-                  title: item.sName,
-                  iId: item.iId,
+                  title: item.Name,
+                  iId: item.Id,
                 }));
                 setcompanyList(formattedData);
               

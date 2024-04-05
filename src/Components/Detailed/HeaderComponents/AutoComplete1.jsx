@@ -72,8 +72,8 @@ const AutoComplete1 = ({
     const handleAutocompleteChange = (event, newValue) => {
         const updatedFormData = {
           ...formData,
-          sName: newValue ? newValue.sName : null,//"" was replaced by null
-          iId: newValue ? newValue.iId : null,//"" was replaced by null
+          sName: newValue ? newValue.Name : null,//"" was replaced by null
+          iId: newValue ? newValue.Id : null,//"" was replaced by null
          
          
         };
@@ -96,9 +96,11 @@ const AutoComplete1 = ({
               const formDataiType =iTypeF2
               const iUser = iId;
               const iTag = iLinkTag;
-              const response = await getAutocomplete1(iTag)
-              if(response?.data?.result)
-              setAutoMenu((JSON.parse(response.data.result)));
+              
+              const response = await getAutocomplete1(iTag,{search:autoSearchKey})
+              
+              if(response?.result)
+              setAutoMenu((JSON.parse(response.result)));
             } catch (error) {
               console.log(error);
             }
@@ -109,20 +111,20 @@ const AutoComplete1 = ({
   
       useEffect(() => {
         
-        if(AutoMenu && AutoMenu[1]?.sCode){
+        if(AutoMenu && AutoMenu[1]?.Code){
           setsCodeReq(true)
         }
       }, [AutoMenu])
       useEffect(() => {//for edit case
         
-        const matchingItem = AutoMenu.find(item => item.iId.toString() === formDataHeader[key1]?.toString());
+        const matchingItem = AutoMenu.find(item => item.Id.toString() === formDataHeader[key1]?.toString());
         if (matchingItem) {
           setFormData({
             ...formData,
-            sName: matchingItem.sName,
-            sCode: matchingItem.sCode,
-            iId: matchingItem.iId,
-            [sFieldName]: matchingItem.iId // assuming sFieldName is the field to store the iId
+            sName: matchingItem.Name,
+            sCode: matchingItem.Code,
+            iId: matchingItem.Id,
+            [sFieldName]: matchingItem.Id // assuming sFieldName is the field to store the iId
           });
         }
       }, [formDataHeader[key1],AutoMenu])
@@ -137,20 +139,20 @@ const AutoComplete1 = ({
     sx={{height:"35px", marginTop:"0px"}}
       id={autoId}
       options={AutoMenu}
-      getOptionLabel={(option) => option && option.sName ? option.sName : ""}
+      getOptionLabel={(option) => option && option.Name ? option.Name : ""}
       value={
-        AutoMenu.find((option) => option.sName === formData.sName) || null
+        AutoMenu.find((option) => option.Name === formData.sName) || null
       }
       onChange={handleAutocompleteChange}
       filterOptions={(options, { inputValue }) => {
         return options.filter(
           (option) =>
-          option.sName?.toLowerCase().includes(inputValue.toLowerCase()) ||
-          option.sCode?.toLowerCase().includes(inputValue.toLowerCase())
+          option.Name?.toLowerCase().includes(inputValue.toLowerCase()) ||
+          option.Code?.toLowerCase().includes(inputValue.toLowerCase())
          
         );
       }}
-      onInputChange={(newInputValue, reason) => {
+      onInputChange={(event,newInputValue, reason) => {
         if (reason === 'input') { // Check if the change is due to user input
           setautoSearchKey(newInputValue);
           // You might need to update formData here to reflect the change
@@ -171,11 +173,11 @@ const AutoComplete1 = ({
             }}
           >
             <Typography style={{ marginRight: "auto", fontSize: "12px" }}>
-              {option.sName}
+              {option.Name}
             </Typography>
-            {option.sCode &&
+            {option.Code &&
             <Typography style={{ marginLeft: "auto", fontSize: "12px" }}>
-              {option.sCode}
+              {option.Code}
             </Typography>
             }
           </div>
@@ -206,15 +208,15 @@ const AutoComplete1 = ({
             },
             inputProps: {
               ...params.inputProps,
-              autoComplete: 'nope',
+              autoComplete: 'off',
               maxLength: iMaxSize,
               onKeyDown: (event) => {
                 if (event.key === "F2") {
                   // Clear selected option and search key before handling F2 press
                   const updatedFormData = {
                     ...formData,
-                    sName: newValue ? newValue?.sName : "",
-                    iId: newValue ? newValue?.iId : "",
+                    sName: newValue ? newValue?.Name : "",
+                    iId: newValue ? newValue?.Id : "",
                    
                    
                   };

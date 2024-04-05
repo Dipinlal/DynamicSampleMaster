@@ -76,14 +76,14 @@ const Login = () => {
     }
    try {
     const response = await Login_Login(formData)
-    
+   
    if(response.status === 200){
     setAlertMessage(response.data.message);
     setShowAlert(true);
     setalertcolor("#28a745")//green
  
     const { accessToken, refreshToken } = response?.data?.tokens;
-   
+
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
 
@@ -201,6 +201,7 @@ const Login = () => {
     const fetchData = async () => {
       try {
         const response = await Login_GetCompany();
+        
         if (response.statusCode === 200 && response.status === "Success") {
           setcompanyList(JSON.parse(response.result));
         } else {
@@ -275,8 +276,8 @@ const Login = () => {
           }}
         >
           {companyList.map((company) => (
-            <MenuItem key={company.iId} value={company.sDatabase}>
-              {company.sDatabase}
+            <MenuItem key={company.Id} value={company.Company}>
+              {company.Company}
             </MenuItem>
           ))}
         </Select>

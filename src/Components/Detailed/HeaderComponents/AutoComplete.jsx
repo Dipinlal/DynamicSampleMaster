@@ -214,7 +214,7 @@ const AutoComplete = ({
             },
             inputProps: {
               ...params.inputProps,
-              autoComplete: 'nope',
+              autoComplete: 'off',
               maxLength: iMaxSize,
               onKeyDown: (event) => {
                 if (event.key === "F2") {

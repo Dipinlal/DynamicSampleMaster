@@ -9,7 +9,7 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
     const [companyList, setcompanyList] = useState([]);
     const [changesTriggered, setchangesTriggered] = useState(false);
     const [selectedCompanyId, setSelectedCompanyId] = useState(formDataHeader[key1]);
-    
+   
     
       useEffect(() => {
         setradioValue(formData)
@@ -25,13 +25,13 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
           try {
             const iTag = iLinkTag;
             const response = await getAutocomplete1(iTag)
-            const resultData = JSON.parse(response.data.result)
+            const resultData = JSON.parse(response.result)
             if(resultData.length>0){
             
               
                 const formattedData = resultData.map((item) => ({
-                  title: item.sName,
-                  iId: item.iId,
+                  title: item.Name,
+                  iId: item.Id,
                 }));
                 setcompanyList(formattedData);
               
@@ -80,7 +80,7 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
                         className="radiomainD1BoxMS"
                       >
                         {companyList.map(company => (
-                                    <label key={company.iId}>
+                                    <label key={company.Id}>
                                         <input
                                             type="radio"
                                             name={sFieldName}

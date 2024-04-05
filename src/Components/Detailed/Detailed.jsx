@@ -67,10 +67,10 @@ function Detailed() {
             
          const response = await getFields()
             
-       
-       if(response.data.result){
-        setheaderData(JSON.parse(response.data.result)) 
-         console.log(JSON.parse(response.data.result));
+   
+       if(response?.result){
+        setheaderData(JSON.parse(response.result)) 
+         console.log(JSON.parse(response.result));
        }
        else{
         setheaderData([])

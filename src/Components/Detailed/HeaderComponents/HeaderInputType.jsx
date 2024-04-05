@@ -305,7 +305,7 @@ const doesDateExist = (dateStr) => {
         
         case "Autocomplete":
           return (
-            <AutoComplete
+            <AutoComplete1
               formData={autoCompleteData}
               setFormData={setAutoCompleteData}
               width="92%"
