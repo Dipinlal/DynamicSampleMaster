@@ -16,7 +16,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
     const [tabData, settabData] = useState([])
     
   
-    
+    //for grouping
     useEffect(() => {
       const groupedData = headerData
         .filter((field) => field.bDisplayed) // Consider only displayed fields
@@ -110,7 +110,21 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
       if (headerData && Array.isArray(headerData)) {
           const newFormData = headerData.reduce((acc, curr) => {
             const existingValue = formData[curr.sFieldName];
-              if (curr.sFieldName) {
+            const existingId = formData[curr.sFieldId]
+              if(curr.sType == "Autocomplete"){
+                if (existingValue !== undefined) {
+
+                  acc[curr.sFieldId] = existingId
+                  acc[curr.sFieldName] = existingValue
+                  } else { 
+                    acc[curr.sFieldId] = 0
+                    acc[curr.sFieldName] = ""
+                  }
+                
+                
+              }
+              
+              else if (curr.sFieldName) {
                 if (existingValue !== undefined) {
                   // If there's an existing value, preserve it
                   acc[curr.sFieldName] = existingValue;
@@ -119,8 +133,10 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
                   acc[curr.sFieldName] = curr.sDataType === 'number' ? 0 : "";
               }
               }
+              
               return acc;
           }, {});
+        
           setformData(prevFormData => ({ ...prevFormData, ...newFormData }));
       }
   }, [headerData]);
@@ -129,14 +145,21 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
         setselectedHeaderMain(value)
     }
 
-    const HeaderInputValue = (key,value)=>{
+    // const HeaderInputValue = (key,value)=>{
       
-        setformData({
-            ...formData,
-            [key]:value
-        })
+    //     setformData({
+    //         ...formData,
+    //         [key]:value
+    //     })
 
-    }
+    // }
+    const HeaderInputValue = (key, value, additionalValues = {}) => {console.log(key, value, additionalValues);
+      setformData(prev => ({
+          ...prev,
+          [key]: value,
+          ...additionalValues // Spread any additional values into the formData
+      }));
+  };
    useEffect(() => {
      const data = {
       ...formData
@@ -210,6 +233,9 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
                     sErrorMsgConditions={field.sErrorMsgConditions}//done need more error condtions.
                     label={field.sFieldCaption}//done
                     key1={field.sFieldName}//done
+                    sFieldId={field.sFieldId}//
+                    
+
                     sLanguageDisplayedWith={field.sLanguageDisplayedWith}//it is difficult with validation like checking special character.    
                     iLinkTag={field.sLinkApi}//done
                     sTabName={field.sTabName}     

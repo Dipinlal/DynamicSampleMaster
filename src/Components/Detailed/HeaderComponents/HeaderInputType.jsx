@@ -9,7 +9,7 @@ import Radio from './radio/Radio';
 
 
 
-const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,key1, type, HeaderInputValue, isMandatory, isDisabled,formDataHeader,label,iMaxSize,iLinkTag,isHeader,sDatatype,sDefaultValue,sErrorMsgConditions,
+const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,key1,sFieldId, type, HeaderInputValue, isMandatory, isDisabled,formDataHeader,label,iMaxSize,iLinkTag,isHeader,sDatatype,sDefaultValue,sErrorMsgConditions,
   triggerValidation,resetTriggerVAlidation,onError
 }) => {
 
@@ -168,12 +168,25 @@ const doesDateExist = (dateStr) => {
     useEffect(() => {
      
       if(autoCompleteData && type ==="Autocomplete"){
-      if(autoCompleteData?.iId){
-        const val=autoCompleteData.iId
-        HeaderInputValue(key1,val)
+      if(autoCompleteData?.sName){
+        const name=autoCompleteData?.sName
+        const id =autoCompleteData?.iId
+       
+        const additionalValues = {
+          [`${sFieldId}`]: id,
+          // Add as many other key-value pairs as needed
+      };
+      HeaderInputValue(key1,name,additionalValues)
+      
+        
       }
       else{
-        HeaderInputValue(key1,0);
+       
+        const additionalValues = {
+          [`${sFieldId}`]: 0,
+          // Add as many other key-value pairs as needed
+      };
+        HeaderInputValue(key1,"",additionalValues);
         
         
       }
@@ -396,6 +409,8 @@ const doesDateExist = (dateStr) => {
               sFieldName={key1}
               formDataHeader={formDataHeader}
               key1={key1}
+              sFieldId={sFieldId}
+
               
 
             />

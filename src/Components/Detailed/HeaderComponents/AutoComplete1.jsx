@@ -23,12 +23,13 @@ const AutoComplete1 = ({
   isHeader,
   sFieldName,
   formDataHeader,
-  key1
+  key1,
+  sFieldId
 
   
 }) => {
 
- 
+
     
 
       const {iId} = useSelector((state)=>state.authState)
@@ -66,8 +67,10 @@ const AutoComplete1 = ({
     });
   // Effect to sync state with prop changes
   useEffect(() => {
-    setautoSearchKey(formData[sFieldName] || '');
-  }, [formData,sFieldName]);
+    setautoSearchKey(formDataHeader[sFieldName] || '');
+    setFormData({...formData,sName:formDataHeader[sFieldName]??"",iId:formDataHeader[sFieldId]??0})
+    
+  }, []);
 
     const handleAutocompleteChange = (event, newValue) => {
         const updatedFormData = {
@@ -115,19 +118,19 @@ const AutoComplete1 = ({
           setsCodeReq(true)
         }
       }, [AutoMenu])
-      useEffect(() => {//for edit case
-        
-        const matchingItem = AutoMenu.find(item => item.Id.toString() === formDataHeader[key1]?.toString());
-        if (matchingItem) {
-          setFormData({
-            ...formData,
-            sName: matchingItem.Name,
-            sCode: matchingItem.Code,
-            iId: matchingItem.Id,
-            [sFieldName]: matchingItem.Id // assuming sFieldName is the field to store the iId
-          });
-        }
-      }, [formDataHeader[key1],AutoMenu])
+      // useEffect(() => {//for edit case
+      //   console.log(formDataHeader);
+      //   const matchingItem = AutoMenu.find(item => item.Id.toString() === formDataHeader[key1]?.toString());
+      //   if (matchingItem) {
+      //     setFormData({
+      //       ...formData,
+      //       sName: matchingItem.Name,
+      //       sCode: matchingItem.Code,
+      //       iId: matchingItem.Id,
+      //       [sFieldName]: matchingItem.Id // assuming sFieldName is the field to store the iId
+      //     });
+      //   }
+      // }, [formDataHeader[key1],AutoMenu])
       
 
   return (
@@ -141,7 +144,7 @@ const AutoComplete1 = ({
       options={AutoMenu}
       getOptionLabel={(option) => option && option.Name ? option.Name : ""}
       value={
-        AutoMenu.find((option) => option.Name === formData.sName) || null
+        AutoMenu.find((option) => option.Name === formDataHeader[sFieldName]) || null
       }
       onChange={handleAutocompleteChange}
       filterOptions={(options, { inputValue }) => {
@@ -152,15 +155,10 @@ const AutoComplete1 = ({
          
         );
       }}
-      onInputChange={(event,newInputValue, reason) => {
-        if (reason === 'input') { // Check if the change is due to user input
+      onInputChange={(event, newInputValue) => {
+       
           setautoSearchKey(newInputValue);
-          // You might need to update formData here to reflect the change
-          setFormData({
-            ...formData,
-            [sFieldName]: newInputValue, // Assuming you want to track the display value in formData
-          });
-        }
+        
       }}
       renderOption={(props, option) => (
         <li {...props}>
@@ -216,7 +214,7 @@ const AutoComplete1 = ({
                   const updatedFormData = {
                     ...formData,
                     sName: newValue ? newValue?.Name : "",
-                    iId: newValue ? newValue?.Id : "",
+                    iId: newValue ? newValue?.Id : 0,
                    
                    
                   };
