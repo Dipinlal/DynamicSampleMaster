@@ -22,7 +22,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     const [checkedItems, setCheckedItems] = useState(formDataHeader[key1]);
  
  
-  
+    // const errorMessages = JSON.parse(sErrorMsgConditions)
     
     const handleError = (errorMessage) => {
       setError(errorMessage);
@@ -153,9 +153,9 @@ const doesDateExist = (dateStr) => {
         
     }
     
-      if (["When empty", "When Empty"].includes(sErrorMsgConditions) && (formDataHeader[key1] == "" ||formDataHeader[key1] == undefined)) {
-          error = "Can't be empty";
-      }
+      // if (["When empty", "When Empty"].includes(sErrorMsgConditions) && (formDataHeader[key1] == "" ||formDataHeader[key1] == undefined)) {
+      //     error = "Can't be empty";
+      // }
 
       handleError(error);
       return error === ""; // Returns true if no error, false otherwise
@@ -300,6 +300,83 @@ const doesDateExist = (dateStr) => {
           onChange={handleChange}
           onBlur={handleDateBlur}
         />
+        
+        );
+
+        case "TextArea":
+        return (
+          <TextField
+          label={isHeader === "true" ? label : null}
+          error={isError} // Show error state based on isError
+          helperText={isError} // Optional: display an error message
+          variant="outlined"
+          fullWidth
+          disabled={isDisabled}
+          multiline // Enable multiline input for text area functionality
+          rows={2} // Minimum number of visible rows
+          InputProps={{
+            style: {
+              borderWidth: "1px",
+              borderColor: "transparent",
+              borderStyle: "solid",
+              borderRadius: "10px",
+              fontSize: "12px",
+              height: "auto", // Adjusted for text area
+              paddingLeft: "0px",
+              textAlign: "center",
+            },
+            inputProps: {
+              maxLength: iMaxSize ? iMaxSize + 1 : 200,
+            },
+          }}
+          InputLabelProps={{
+            style: {
+              fontSize: "16px",
+              color: isMandatory ? "red" : "inherit",
+            },
+            shrink: sDatatype === "date" ? true : undefined, // Automatically shrink label for date type
+          }}
+          sx={{
+            "& .MuiOutlinedInput-input": {
+              padding: "8px 14px",
+              // Removed transform for better text area support
+            },
+            "& .MuiInputLabel-outlined": {
+              transform: "translate(14px, 12px) scale(0.75)",
+            },
+            "& .MuiInputLabel-outlined.MuiInputLabel-shrink": {
+              transform: "translate(14px, -6px) scale(0.75)",
+              backgroundColor: "#fff",
+              padding: "0px 2px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                top: 0,
+                borderTopLeftRadius: "10px",
+                borderBottomLeftRadius: "10px",
+                borderLeftColor: isMandatory ? "red" : "#ddd",
+                borderLeftWidth: isMandatory ? "2px" : "1px",
+              },
+              "&.Mui-focused fieldset": {
+                borderTopLeftRadius: "10px",
+                borderBottomLeftRadius: "10px",
+                borderLeftColor: isMandatory ? "red" : "currentColor",
+                borderLeftWidth: isMandatory ? "2px" : "1px",
+              },
+            },
+            '& .MuiInputLabel-outlined.Mui-focused': {
+              color: 'currentColor',
+            },
+            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'currentColor',
+            }
+          }}
+          type="textarea" // This prop is not necessary since `multiline` is used for text area functionality
+          value={formDataHeader[key1]}
+          onChange={handleChange}
+          onBlur={handleDateBlur}
+        />
+        
         
         );
         

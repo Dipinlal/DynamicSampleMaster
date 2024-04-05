@@ -13,10 +13,9 @@ const refreshToken = async () => {
   try {
     const refreshTokenValue = localStorage.getItem("refreshToken");
     
+    
     const payload = { refershToken: refreshTokenValue };
-    const response = await axios.get(`${BASE_URL}Security/RegenerateTokens`, {
-      params: payload,
-    });
+    const response = await axios.get(`${BASE_URL}/Security/RegenerateTokens?refershToken=${refreshTokenValue}`);
 
     const { accessToken, refreshToken } = response?.data;
 
@@ -29,8 +28,8 @@ const refreshToken = async () => {
     console.error("Failed to refresh token", error);
 
     // Clear tokens from local storage in case of an error
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    // localStorage.removeItem("accessToken");
+    // localStorage.removeItem("refreshToken");
 
     throw error;
   }
@@ -55,6 +54,7 @@ api.interceptors.response.use(
       try {
         // Try to refresh the token
         const newAccessToken = await refreshToken();
+        
         // Retry the original request with the new access token
         error.config.headers.Authorization = `Bearer ${newAccessToken}`;
         return axios.request(error.config);
@@ -132,7 +132,7 @@ export const getAutocomplete = async (formDataiType,productSearchkey) => {
 };
 export const getAutocomplete1 = async (itag,params) => {
 
-  
+ 
     return makeAuthorizedRequest("get",itag,params);
     // const headers = {
     //   "Content-Type": "application/json",

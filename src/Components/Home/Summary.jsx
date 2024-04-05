@@ -224,7 +224,7 @@ export default function Summary() {
     const response = await getEmployeeSummary();
     if (response?.status === "Success") {
       const myObject = JSON.parse(response?.result);
-      console.log(myObject);
+      
       setData(myObject);
     }
     handleClose();
