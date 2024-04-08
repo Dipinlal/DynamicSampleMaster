@@ -39,70 +39,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
     };
   
 
-    const fixedFields = [{
-      sFieldName:"sDocNo",
-      sFieldCaption:"Document No",
-      iDataType:1,
-      bMandatory:0,
-      bReadOnly:1,
-      iMaxSize:15,
-      iLinkTag:0
-   },
-   {
-    sFieldName:"sDate",
-    sFieldCaption:"Date",
-    iDataType:3,
-    bMandatory:0,
-    bReadOnly:0,
-    iMaxSize:15,
-    iLinkTag:0
- },
- {
-  sFieldName:"Inventerory account",//not correct
-  sFieldCaption:"Inventeroryaccount",
-  iDataType:2,
-  bMandatory:0,
-  bReadOnly:0,
-  iMaxSize:15,
-  iLinkTag:0
-},
-{
-  sFieldName:"Supplier account",//not correct
-  sFieldCaption:"Supplier account",
-  iDataType:2,
-  bMandatory:0,
-  bReadOnly:0,
-  iMaxSize:15,
-  iLinkTag:0
-},
-{
-  sFieldName:"sDueDate",//not correct
-  sFieldCaption:"Due Date",
-  iDataType:3,
-  bMandatory:0,
-  bReadOnly:0,
-  iMaxSize:15,
-  iLinkTag:0
-},
-{
-  sFieldName:"Vendorinvoiceno",//not correct
-  sFieldCaption:"Vendor invoice no",
-  iDataType:2,
-  bMandatory:0,
-  bReadOnly:0,
-  iMaxSize:15,
-  iLinkTag:0
-},
-{
-  sFieldName:"sNarration",
-  sFieldCaption:"Narration",
-  iDataType:7,
-  bMandatory:0,
-  bReadOnly:0,
-  iMaxSize:200,
-  iLinkTag:0
-},
-  ]
+   
  
   // Reset errors when needed, such as on successful save or field value change
  
@@ -130,7 +67,30 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
                   acc[curr.sFieldName] = existingValue;
               } else {
                   // Initialize field based on its data type
-                  acc[curr.sFieldName] = curr.sDataType === 'number' ? 0 : "";
+  if (curr.sDefaultValue !== undefined) {
+    // Handle default value based on the specified data type
+    switch (curr.sDatatype) {
+      case 'integer':
+        // Parse sDefaultValue to integer and store as number
+        acc[curr.sFieldName] = parseInt(curr.sDefaultValue, 10);
+        break;
+      case 'float':
+        // Store sDefaultValue as is to preserve formatting like "0.00"
+        acc[curr.sFieldName] = parseFloat(curr.sDefaultValue);
+        break;
+      case 'number':
+        // Try to parse as float first, then decide if integer format is needed
+        const parsedValue = parseFloat(curr.sDefaultValue);
+        acc[curr.sFieldName] = Number.isInteger(parsedValue) ? parsedValue : curr.sDefaultValue;
+        break;
+      default:
+        // For non-numeric types, use the default value directly
+        acc[curr.sFieldName] = curr.sDefaultValue;
+    }
+  } else {
+    // Fallback for when there's no default value specified, ensuring numeric types get 0
+    acc[curr.sFieldName] = (curr.sDatatype === 'number' || curr.sDatatype === 'integer' || curr.sDatatype === 'float') ? 0 : "";
+  }
               }
               }
               
@@ -153,7 +113,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
     //     })
 
     // }
-    const HeaderInputValue = (key, value, additionalValues = {}) => {console.log(key, value, additionalValues);
+    const HeaderInputValue = (key, value, additionalValues = {}) => {console.log(key, value);
       setformData(prev => ({
           ...prev,
           [key]: value,
@@ -184,24 +144,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
       selectedHeaderMain ==="Main" &&
       <div>
 
-        {/* {
-          fixedFields.map((field)=>(
-            <DynamicInputFieldHeader
-                    key={field.sFieldName}
-                    label={field.sFieldCaption}
-                    key1={field.sFieldName}
-                    type={field.iDataType}
-                    HeaderInputValue={HeaderInputValue}
-                    isMandatory={field.bMandatory}
-                    isDisabled={field.bReadOnly}
-                    formDataHeader={formData}
-                    iMaxSize={field.iMaxSize}
-                    iLinkTag={field.iLinkTag}
-                    isHeader="true"
-
-                />
-          ))
-        } */}
+     
          {tabNames.map((tabName, index) => (
         <div
           key={tabName}

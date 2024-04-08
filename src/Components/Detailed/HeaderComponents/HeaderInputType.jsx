@@ -15,79 +15,164 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
 
     const [value, setValue] = useState('');
     const [autoCompleteData, setAutoCompleteData] = useState({})//forAucomplete only
-    const [dateValue, setDateValue] = useState('');
+
     const [isError, setError] = useState(false);
     const [checkBoxData, setcheckBoxData] = useState({})
     const [radioValue, setradioValue] = useState(null)
     const [checkedItems, setCheckedItems] = useState(formDataHeader[key1]);
- 
+    const [fieldErrors, setFieldErrors] = useState({});
+
  
     // const errorMessages = JSON.parse(sErrorMsgConditions)
     
     const handleError = (errorMessage) => {
-      setError(errorMessage);
-      onError(label, errorMessage); // Report error back to parent with field key and message
-    };
+      setFieldErrors(prevErrors => ({
+        ...prevErrors,
+        [key1]: errorMessage,
+      }));
     
-    const handleChange = (e) => {
-      let val = e.target.value;
-      const inputLength = val.length;
-     
-      // Handle maximum size constraint
-      if (iMaxSize && inputLength >= iMaxSize+1) {
-          handleError(`Maximum length of ${iMaxSize} characters reached`);
-          
-          val = val.slice(0, iMaxSize); // Enforce max length
-      } else {
-          setError(false);
+      // Call onError prop with the error message if provided
+      if (onError) {
+        onError(label, errorMessage);
       }
-      if (sDatatype === "number" && !bNegative && val.includes('-')) {
-        setError(`Negative value not allowed`);
-        val = val.replace('-', '');
-    }else if (sDatatype === "text") {
-      // if (!bAllowSpecialChar) {
-      //     const hasSpecialChar = /[^a-zA-Z0-9 ]/.test(val);
-      //     if (hasSpecialChar) {
-      //         setError('Special characters are not allowed.');
-      //     }
-      //     else{
-      //       setError("")
-      //     }
-      //     val = val.replace(/[^a-zA-Z0-9 ]/g, '');
-      // }
-      if (!bAllowSpecialChar) {
-        // Define a list of disallowed characters
-        const disallowedChars = [
-          '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
-          '=', '+', '[', '{', ']', '}', '\\', '|', ';', ':', "'", '"', ',', '<',
-          '.', '>', '/', '?'
-        ];
-    
-        // Check if the input value contains any disallowed character
-        const hasSpecialChar = disallowedChars.some(char => val.includes(char));
-    
-        if (hasSpecialChar) {
-          setError('Special characters are not allowed.');
+    };
+    const clearFieldError = (key) => {
+      setFieldErrors(prevErrors => ({
+        ...prevErrors,
+        [key]: '',
+      }));
+    };
+
+    const validateField = (val) => {
+      let error = "";
+      
+      if (sDatatype === "date") {
+        if ((formDataHeader[key1]) && !doesDateExist(formDataHeader[key1])) {//added  formDataHeader[key1]) instead of datevalue and check only for valid entry not empty date. empty date allowed. if mandatory check using isMandatory
+          error = "Invalid date";
         } 
-    
-        // Remove disallowed characters from the input value
-        //val = val.split('').filter(char => !disallowedChars.includes(char)).join('');
       }
-  } else if (sDatatype === "date") {
-      setDateValue(val); 
+      if (sDatatype === "text" && !bAllowSpecialChar) {
+        
+          const disallowedChars = [
+            '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
+            '=', '+', '[', '{', ']', '}', '\\', '|', ';', ':', "'", '"', ',', '<',
+            '.', '>', '/', '?'
+          ];
+      
+          // Check if the input value contains any disallowed character
+          const hasSpecialChar = disallowedChars.some(char => formDataHeader[key1].includes(char));
+      
+          if (hasSpecialChar) {
+            error = 'Special characters are not allowed.';
+          }
+          
+         
+        
+    }
+    if (sDatatype === "number" && !bNegative && val.includes('-')) {
+      error = `Negative value not allowed`;
+      val = val.replace('-', '');
   }
+  else if (sDatatype === "integer") {
+    // First, check if negative values are not allowed but a negative sign is attempted
+    if (!bNegative && val.startsWith('-')) {
+      error = `Negative value not allowed`;
+      // Optionally, you might want to remove the negative sign or leave it to show the error
+      val = val.replace('-', ''); // Remove the negative sign if you don't want it to appear at all
+    } 
+    
+    // Then, allow only digits (and negative sign if bNegative is true)
+    val = bNegative ? val.replace(/[^0-9-]/g, '') : val.replace(/[^0-9]/g, '');
+    
+    const parsedInt = parseInt(val, 10);
+    if (!isNaN(parsedInt)) {
+      val = parsedInt;
+    } else if (val !== '-' && bNegative) { // Allow a standalone "-" if negatives are allowed
+      val = 0; // Set to some default value if parsing fails
+    }
+  }else if (sDatatype === "float") {
+    // Allow numbers with decimal points, remove non-numeric characters except for a single decimal point
+    if (!bNegative && val.startsWith('-')) {
+      error = `Negative value not allowed`;
+      val = val.replace('-', '');
+    }
+    // Replace anything that's not a number or more than one decimal point
+    let decimalCount = 0;
+    val = val.split('').filter((char) => {
+      if (char === '.') {
+        decimalCount += 1;
+        return decimalCount <= 1; // Allow only one decimal point
+      }
+      return /[0-9]/.test(char);
+    }).join('');
+  }
+     
+      
 
-   
-   
-    HeaderInputValue(key1, val);
+     
+      return {error,val}  // Returns true if no error, false otherwise
+  };
+    const handleValidation = (inputValue) => {
+      let errorMessage = "";
+      let newInputvalue = inputValue;
+      const today = new Date();
+      const selectedDate = new Date(inputValue); //added  formDataHeader[key1]) instead of datevalue
+      today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      if (sErrorMsgConditions) {
+        const conditions = JSON.parse(sErrorMsgConditions);
+
+        for (const condition of conditions) {
+          switch (condition.errorcondition) {
+            case "Empty":
+              if (!inputValue.trim()) {
+                errorMessage = condition.message;
+              }
+              break;
+            case "maxlength":
+              if (inputValue.length > iMaxSize) {
+                errorMessage = condition.message;
+                newInputvalue = inputValue.slice(0, iMaxSize);
+              }
+              break;
+            case "Before":
+              // Assuming inputValue is a date string in the format 'YYYY-MM-DD'
+              if (new Date(selectedDate) < today) {
+                errorMessage = condition.message;
+              }
+              break;
+            case "After":
+              if (new Date(selectedDate) > new Date(today)) {
+                errorMessage = condition.message;
+              }
+              break;
+            // ... handle other conditions
+            default:
+              break;
+          }
+          // If any error was found, break the loop
+          if (errorMessage) break;
+        }
+      }
+      const response = validateField(inputValue);
+      const {error,val} = response
+      
+      if (error) {
+        errorMessage = error;
+      }
+      
+      newInputvalue = val;
+      
+      handleError(errorMessage);
+      return newInputvalue
     };
-
+    
+    
+  
 
  //Validate date
- const isRealDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return !isNaN(date.getTime());
-};
+
 
 const isValidDateFormat = (dateStr) => {
   // Assuming ISO format for simplicity: YYYY-MM-DD
@@ -106,65 +191,101 @@ const doesDateExist = (dateStr) => {
 };
 
 
-    const validateField = () => {
-      let error = "";
-      
-      if (sDatatype === "date") {
-        if (!doesDateExist(formDataHeader[key1])) {//added  formDataHeader[key1]) instead of datevalue
-          error = "Invalid date";
-        } else if (bAllowDateBefore !== null) {
-              const today = new Date();
-              const selectedDate = new Date(formDataHeader[key1]);//added  formDataHeader[key1]) instead of datevalue
-              today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
+// Each value change
+const handleChange = (e) => {
+     
+  let val = e.target.value;
+ 
 
-              // If dates before today are not allowed and the selected date is in the past
-              if (!bAllowDateBefore && selectedDate < today) {
-                  error = "Date cannot be in the past";
-              }
-          }
-      }
-      if (sDatatype === "text" && !bAllowSpecialChar) {
-        // if (!bAllowSpecialChar) {
-        //     const hasSpecialChar = /[^a-zA-Z0-9 ]/.test(val);
-        //     if (hasSpecialChar) {
-        //         setError('Special characters are not allowed.');
-        //     }
-        //     else{
-        //       setError("")
-        //     }
-        //     val = val.replace(/[^a-zA-Z0-9 ]/g, '');
-        // }
-       
-          // Define a list of disallowed characters
-          const disallowedChars = [
-            '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
-            '=', '+', '[', '{', ']', '}', '\\', '|', ';', ':', "'", '"', ',', '<',
-            '.', '>', '/', '?'
-          ];
+ const newVal = handleValidation(val);
+  
+   
+  
+//   if (sDatatype === "number" && !bNegative && val.includes('-')) {
+//     handleError(`Negative value not allowed`);
+//     val = val.replace('-', '');
+// }
+// else if (sDatatype === "integer") {
+//   // First, check if negative values are not allowed but a negative sign is attempted
+//   if (!bNegative && val.startsWith('-')) {
+//     handleError(`Negative value not allowed`);
+//     // Optionally, you might want to remove the negative sign or leave it to show the error
+//     val = val.replace('-', ''); // Remove the negative sign if you don't want it to appear at all
+//   } 
+  
+//   // Then, allow only digits (and negative sign if bNegative is true)
+//   val = bNegative ? val.replace(/[^0-9-]/g, '') : val.replace(/[^0-9]/g, '');
+  
+//   const parsedInt = parseInt(val, 10);
+//   if (!isNaN(parsedInt)) {
+//     val = parsedInt;
+//   } else if (val !== '-' && bNegative) { // Allow a standalone "-" if negatives are allowed
+//     val = 0; // Set to some default value if parsing fails
+//   }
+// }else if (sDatatype === "float") {
+//   // Allow numbers with decimal points, remove non-numeric characters except for a single decimal point
+//   if (!bNegative && val.startsWith('-')) {
+//     handleError(`Negative value not allowed`);
+//     val = val.replace('-', '');
+//   }
+//   // Replace anything that's not a number or more than one decimal point
+//   let decimalCount = 0;
+//   val = val.split('').filter((char) => {
+//     if (char === '.') {
+//       decimalCount += 1;
+//       return decimalCount <= 1; // Allow only one decimal point
+//     }
+//     return /[0-9]/.test(char);
+//   }).join('');
+// }
+
+  HeaderInputValue(key1, newVal);
+
+
+};
+
+
+   
+    // Additional checking and conversion after typping
+    const handleBlur = (e) => {
+     
       
-          // Check if the input value contains any disallowed character
-          const hasSpecialChar = disallowedChars.some(char => formDataHeader[key1].includes(char));
-      
-          if (hasSpecialChar) {
-            error = 'Special characters are not allowed.';
-          }
-          
-         
+      let val = e.target.value;
+      const newVal = handleValidation(val);// To validate after value has entered
+     
         
-    }
-    
-      // if (["When empty", "When Empty"].includes(sErrorMsgConditions) && (formDataHeader[key1] == "" ||formDataHeader[key1] == undefined)) {
-      //     error = "Can't be empty";
-      // }
+      
 
-      handleError(error);
-      return error === ""; // Returns true if no error, false otherwise
-  };
-    const handleDateBlur = () => {
-      validateField()
+          // to convert number in string to integer or float.onchange number comes in string, so converted here to required format
+          let numericalValue;
+          if (sDatatype === "integer") {//for making integer
+            numericalValue = parseInt(formDataHeader[key1], 10);
+            if (isNaN(numericalValue)) numericalValue = 0; // Fallback to 0 if the conversion fails
+            HeaderInputValue(key1, numericalValue);
+        } else if (sDatatype === "float") {//for making float
+            numericalValue = parseFloat(formDataHeader[key1]);
+            if (isNaN(numericalValue)) numericalValue = 0.0; // Fallback to 0.0 if the conversion fails
+            HeaderInputValue(key1, numericalValue);
+
+        }
+       
+        if(numericalValue){
+
+          HeaderInputValue(key1, numericalValue);
+        }
+        else{
+          HeaderInputValue(key1, newVal);
+        }
+       
+       
+       
     
+        
+        
   };
 
+
+  //handle autocomplete 
     useEffect(() => {
      
       if(autoCompleteData && type ==="Autocomplete"){
@@ -193,6 +314,9 @@ const doesDateExist = (dateStr) => {
      }
 
     }, [autoCompleteData])
+
+
+    // handle checkbox
     useEffect(() => {
      
       if(type ==="CheckBoxes"){
@@ -206,6 +330,9 @@ const doesDateExist = (dateStr) => {
      }
 
     }, [checkBoxData])
+
+
+    //handle radio
     useEffect(() => {
      
       if(type ==="Radio"){
@@ -221,14 +348,16 @@ const doesDateExist = (dateStr) => {
     }, [radioValue])
   
 
-  
+  // To validate on saving
   useEffect(()=>{
     if(triggerValidation){
-      validateField()
+      handleValidation()
       resetTriggerVAlidation()
     }
    
   },[triggerValidation])
+
+  //handle single checkbox 
   const handleItemToggle = (e) => {
     const itemName = e.target.name; // Using the name attribute to identify the checkbox
     const isChecked = e.target.checked ? 1 : 0; // The checked status of the checkbox
@@ -245,8 +374,8 @@ const doesDateExist = (dateStr) => {
         return (
           <TextField
           label={isHeader === "true" ? label : null}
-          error={isError} // Show error state based on isMaxSizeError
-          helperText={isError} // Optional: display an error message
+          error={!!fieldErrors[key1]} // Use the error state for this field
+          helperText={fieldErrors[key1]} // Display the error message
           variant="outlined"
           fullWidth
           disabled={isDisabled}
@@ -262,7 +391,7 @@ const doesDateExist = (dateStr) => {
               textAlign: "center",
             },
             inputProps: {
-              maxLength: iMaxSize ? iMaxSize + 1 : 200,
+              maxLength: iMaxSize ? iMaxSize : 200,
             },
           }}
           InputLabelProps={{
@@ -311,7 +440,7 @@ const doesDateExist = (dateStr) => {
           type={sDatatype}
           value={formDataHeader[key1]}
           onChange={handleChange}
-          onBlur={handleDateBlur}
+          onBlur={handleBlur}
         />
         
         );
@@ -320,8 +449,8 @@ const doesDateExist = (dateStr) => {
         return (
           <TextField
           label={isHeader === "true" ? label : null}
-          error={isError} // Show error state based on isError
-          helperText={isError} // Optional: display an error message
+          error={!!fieldErrors[key1]} // Use the error state for this field
+          helperText={fieldErrors[key1]} // Display the error message
           variant="outlined"
           fullWidth
           disabled={isDisabled}
@@ -387,7 +516,7 @@ const doesDateExist = (dateStr) => {
           type="textarea" // This prop is not necessary since `multiline` is used for text area functionality
           value={formDataHeader[key1]}
           onChange={handleChange}
-          onBlur={handleDateBlur}
+          onBlur={handleBlur}
         />
         
         
