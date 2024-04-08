@@ -31,7 +31,7 @@ function Detailed() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [headerFormData, setheaderFormData] = useState({
     name:"Edit",cityId:9,cityName:"BERLIN",departmentCheck:"1,2,3,4",
-    countryName:"India",countryId:103
+    
   })
   const [saving, setsaving] = useState(false)
 
@@ -44,7 +44,7 @@ function Detailed() {
     const iDocType = location.state?.iDoctype;
     
 
-    const handleFieldError = (fieldKey, errorMessage) => {
+    const handleFieldError = (fieldKey, errorMessage) => {console.log(fieldKey, errorMessage);
       setFieldErrors(prevErrors => ({
         ...prevErrors,
         [fieldKey]: errorMessage,
@@ -154,166 +154,166 @@ function Detailed() {
    
   // }
 
-  const handleSaveClick = async()=>{
-    setsaveValidation(true)
-    setsaving(true)
-  }
-  const validateAndUpdateFormData = () => {
-    let updatedFormData = { ...headerFormData }; // Make a copy to avoid direct state mutation
-    Object.keys(headerFormData).forEach((formDataKey) => {
-      const matchingField = headerData.find((field) => field.sFieldName === formDataKey);
-      if (matchingField && matchingField.sDatatype === "number" && !headerFormData[formDataKey]) {
-        updatedFormData[formDataKey] = 0; // Set default value if datatype is number and value is falsy
-      }
-    });
-    return updatedFormData;
-  };
+  // const handleSaveClick = async()=>{
+  //   setsaveValidation(true)
+  //   setsaving(true)
+  // }
+  // const validateAndUpdateFormData = () => {
+  //   let updatedFormData = { ...headerFormData }; // Make a copy to avoid direct state mutation
+  //   Object.keys(headerFormData).forEach((formDataKey) => {
+  //     const matchingField = headerData.find((field) => field.sFieldName === formDataKey);
+  //     if (matchingField && matchingField.sDatatype === "number" && !headerFormData[formDataKey]) {
+  //       updatedFormData[formDataKey] = 0; // Set default value if datatype is number and value is falsy
+  //     }
+  //   });
+  //   return updatedFormData;
+  // };
   console.log("Saving data:", headerFormData);
-  useEffect(() => {
-    const handleSave = async () => {
-      // Ensure there are no errors before proceeding with the save
-      const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
-      if (errorsArray.length === 0 && saving &&!saveValidation) {
-        try {
-          // Proceed with the saving logic here
-          // Your existing save logic
+  // useEffect(() => {
+  //   const handleSave = async () => {
+  //     // Ensure there are no errors before proceeding with the save
+  //     const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
+  //     if (errorsArray.length === 0 && saving &&!saveValidation) {
+  //       try {
+  //         // Proceed with the saving logic here
+  //         // Your existing save logic
           
-          const updatedHeaderFormData = validateAndUpdateFormData();
+  //         const updatedHeaderFormData = validateAndUpdateFormData();
           
-        // const response = await postEmployee(headerFormData)
+  //       // const response = await postEmployee(headerFormData)
           
-        //   if(response.status === 200){
-        //     setAlertMessage(response.data.message);
-        //     setShowAlert(true);
-        //     setalertcolor("#28a745")//green
+  //       //   if(response.status === 200){
+  //       //     setAlertMessage(response.data.message);
+  //       //     setShowAlert(true);
+  //       //     setalertcolor("#28a745")//green
          
            
         
-        //     setTimeout(() => {
-        //       setShowAlert(false);
+  //       //     setTimeout(() => {
+  //       //       setShowAlert(false);
               
         
-        //     }, 1000);
-        //    }
-        //    else{
-        //     setAlertMessage(response.data.message);
-        //     setShowAlert(true);
-        //     setalertcolor("#ffcc00")//yellow
+  //       //     }, 1000);
+  //       //    }
+  //       //    else{
+  //       //     setAlertMessage(response.data.message);
+  //       //     setShowAlert(true);
+  //       //     setalertcolor("#ffcc00")//yellow
         
             
-        //     setTimeout(() => {
-        //       setShowAlert(false);
-        //       // navigate('/Home')
+  //       //     setTimeout(() => {
+  //       //       setShowAlert(false);
+  //       //       // navigate('/Home')
         
-        //     }, 1000);
-        //    }
-          // Handle successful save (e.g., show success message, navigate away, etc.)
-          setsaving(false); // Reset saving state
-        } catch (error) {
-          console.log(error);
-          setsaving(false);
+  //       //     }, 1000);
+  //       //    }
+  //         // Handle successful save (e.g., show success message, navigate away, etc.)
+  //         setsaving(false); // Reset saving state
+  //       } catch (error) {
+  //         console.log(error);
+  //         setsaving(false);
          
-          if (error.response && error.response.status) {
-            switch (error.response.status) {
-              case 400://bad request
+  //         if (error.response && error.response.status) {
+  //           switch (error.response.status) {
+  //             case 400://bad request
                
-              setAlertMessage(error.response.data.errors.employee[0]);
-              setShowAlert(true);
-              setalertcolor("#ffcc00")//yellow
+  //             setAlertMessage(error.response.data.errors.employee[0]);
+  //             setShowAlert(true);
+  //             setalertcolor("#ffcc00")//yellow
             
       
-              setTimeout(() => {
-                setShowAlert(false);
+  //             setTimeout(() => {
+  //               setShowAlert(false);
                 
       
-              }, 3000);
-                break;
-              case 401://unauthorized
+  //             }, 3000);
+  //               break;
+  //             case 401://unauthorized
                 
-                setAlertMessage(error.response.data.message);
-                setShowAlert(true);
-                setalertcolor("#ffcc00")//yellow
+  //               setAlertMessage(error.response.data.message);
+  //               setShowAlert(true);
+  //               setalertcolor("#ffcc00")//yellow
               
         
-                setTimeout(() => {
-                  setShowAlert(false);
+  //               setTimeout(() => {
+  //                 setShowAlert(false);
                   
         
-                }, 1000);
+  //               }, 1000);
                
-                break;
-              case 403://forbidden
-              setAlertMessage(error.response.data.message);
-              setShowAlert(true);
-              setalertcolor("#ffcc00")//yellow
+  //               break;
+  //             case 403://forbidden
+  //             setAlertMessage(error.response.data.message);
+  //             setShowAlert(true);
+  //             setalertcolor("#ffcc00")//yellow
             
       
-              setTimeout(() => {
-                setShowAlert(false);
+  //             setTimeout(() => {
+  //               setShowAlert(false);
                 
       
-              }, 1000);
+  //             }, 1000);
                
-                break;
-              case 404://Notfound
+  //               break;
+  //             case 404://Notfound
                 
-                setAlertMessage(error.response.data.message);
-              setShowAlert(true);
-              setalertcolor("#ffcc00")//yellow
+  //               setAlertMessage(error.response.data.message);
+  //             setShowAlert(true);
+  //             setalertcolor("#ffcc00")//yellow
             
       
-              setTimeout(() => {
-                setShowAlert(false);
+  //             setTimeout(() => {
+  //               setShowAlert(false);
               
       
-              }, 1000);
-                break;
-              case 409://conflict
-              setAlertMessage(error.response.data.message);
-              setShowAlert(true);
-              setalertcolor("#ffcc00")//yellow
+  //             }, 1000);
+  //               break;
+  //             case 409://conflict
+  //             setAlertMessage(error.response.data.message);
+  //             setShowAlert(true);
+  //             setalertcolor("#ffcc00")//yellow
             
       
-              setTimeout(() => {
-                setShowAlert(false);
+  //             setTimeout(() => {
+  //               setShowAlert(false);
                 
       
-              }, 1000);
+  //             }, 1000);
                
-                break;
-              case 500:
-                console.error("A 500 Internal Server Error occurred.");
-                // Handle server errors
-                break;
-              default:
-                console.error(`An error occurred: ${error.response.status}`);
-                // Handle other types of errors
-                break;
-            }
-          } else {
-            // If the error does not have a response status code, it might be a network error or something else
-            console.error("An error occurred:", error.message);
-            // Handle errors that aren't server responses, like network errors
-          }
-          // Handle save error (e.g., show error message)
-          setsaving(false); // Reset saving state
-        }
-      } else if (errorsArray.length > 0) {
-        const [firstErrorKey, firstErrorMessage] = errorsArray[0];
-        setAlertMessage(`${firstErrorKey}: ${firstErrorMessage}`);
-        setShowAlert(true);
-        setalertcolor("#ffcc00"); // yellow for errors
-        setTimeout(() => {
-        setShowAlert(false);
+  //               break;
+  //             case 500:
+  //               console.error("A 500 Internal Server Error occurred.");
+  //               // Handle server errors
+  //               break;
+  //             default:
+  //               console.error(`An error occurred: ${error.response.status}`);
+  //               // Handle other types of errors
+  //               break;
+  //           }
+  //         } else {
+  //           // If the error does not have a response status code, it might be a network error or something else
+  //           console.error("An error occurred:", error.message);
+  //           // Handle errors that aren't server responses, like network errors
+  //         }
+  //         // Handle save error (e.g., show error message)
+  //         setsaving(false); // Reset saving state
+  //       }
+  //     } else if (errorsArray.length > 0) {
+  //       const [firstErrorKey, firstErrorMessage] = errorsArray[0];
+  //       setAlertMessage(`${firstErrorKey}: ${firstErrorMessage}`);
+  //       setShowAlert(true);
+  //       setalertcolor("#ffcc00"); // yellow for errors
+  //       setTimeout(() => {
+  //       setShowAlert(false);
                 
           
-        }, 1000);
-        setsaving(false); // Ensure we reset the saving flag if there are errors
-      }
-    };
+  //       }, 1000);
+  //       setsaving(false); // Ensure we reset the saving flag if there are errors
+  //     }
+  //   };
   
-    handleSave();
-  }, [fieldErrors, saving,saveValidation]); // Depend on fieldErrors and saving
+  //   handleSave();
+  // }, [fieldErrors, saving,saveValidation]); // Depend on fieldErrors and saving
 
   // useEffect(()=>{
   
@@ -342,6 +342,55 @@ function Detailed() {
 
     
   // },[fieldErrors,saving])
+  const validateField = (fieldConfig, value) => {
+    
+  };
+  const validateAllFields = (headerData, headerFormData) => {
+    let allValid = true;
+    headerData.forEach((field) => {
+      if (field.bDisplayed && field.bMandatory) {
+        const fieldKey = field.sFieldName;
+        const value = headerFormData[fieldKey];
+        if (!value || value.toString().trim() === '') {
+          // If the mandatory field is empty, set an error
+          handleFieldError(fieldKey, `${field.sFieldCaption} is required`);
+          allValid = false;
+        }
+      }
+    });
+    return allValid;
+  };
+  const handleSaveClick = async () => {
+    setsaveValidation(true); // Trigger the validation
+    const allFieldsValidated = validateAllFields(headerData, headerFormData);
+    console.log(allFieldsValidated);
+    if (allFieldsValidated) {
+      setAlertMessage(`No error`);
+        setShowAlert(true);
+        setalertcolor("#ffcc00"); // yellow for errors
+        setTimeout(() => {
+        setShowAlert(false);
+        },1000)
+      // If all fields are validated and there are no errors
+      // Perform the save operation
+    } else {
+         const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
+ 
+    console.log(fieldErrors);
+      if (errorsArray.length > 0) {
+        // Show first error or all errors concatenated, depending on your UI design
+        const [firstErrorKey, firstErrorMessage] = errorsArray[0];
+        setAlertMessage(`${firstErrorKey}: ${firstErrorMessage}`);
+        setShowAlert(true);
+        setalertcolor("#ffcc00"); // yellow for errors
+        setTimeout(() => {
+        setShowAlert(false);
+                
+          
+        }, 1000);
+    }
+  }
+  };
 
   return (<><AlertBox message={alertMessage} show={showAlert} color={alertcolor}/>
     <div className="CustomerListMain">
@@ -414,7 +463,7 @@ function Detailed() {
         
         
       </div>
-      <Header headerData={headerData} triggerValidation={saveValidation} resetTriggerVAlidation={resetSavevalidation}  handleFieldError={handleFieldError} 
+      <Header headerData={headerData} triggerValidation={saveValidation} resetTriggerVAlidation={resetSavevalidation}  handleFieldError={handleFieldError} errorGlobal={fieldErrors}
   resetFieldErrors={resetFieldErrors} headerFormData={headerFormData} setheaderFormData={setheaderFormData}
     />
      

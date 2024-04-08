@@ -24,7 +24,9 @@ const AutoComplete1 = ({
   sFieldName,
   formDataHeader,
   key1,
-  sFieldId
+  sFieldId,
+  triggerValidation,
+  resetTriggerVAlidation
 
   
 }) => {
@@ -38,6 +40,7 @@ const AutoComplete1 = ({
     const [AutoMenu, setAutoMenu] = useState([]);
     const [autoSearchKey, setautoSearchKey] = useState("");
     const [sCodeReq, setsCodeReq] = useState(false)
+    const [error, setError] = useState({ isError: false, message: '' });
 
     const CustomListBox = React.forwardRef((props, ref) => {
       const { children, ...other } = props;
@@ -83,8 +86,21 @@ const AutoComplete1 = ({
         
         setFormData(updatedFormData); // This will now update the parent's state
         setiTypeF2(1)
+        if (isMandatory && !newValue) {
+          setError({ isError: true, message: 'This field is required.' });
+        } else {
+          setError({ isError: false, message: '' });
+        }
+      
+      }
+      const validateInput = (newValue) => {
+        if (isMandatory && !newValue) {
+          setError({ isError: true, message: 'This field is required.' });
+        } else {
+          setError({ isError: false, message: '' });
+        }
       };
-      ;
+      
 
       //get AutoMenu
       useEffect(() => {
@@ -131,6 +147,13 @@ const AutoComplete1 = ({
       //     });
       //   }
       // }, [formDataHeader[key1],AutoMenu])
+      
+
+     useEffect(() => {
+      validateInput(formDataHeader[key1])
+      resetTriggerVAlidation()
+     }, [triggerValidation])
+      
       
 
   return (
@@ -187,6 +210,8 @@ const AutoComplete1 = ({
           {...params}
           label={autoLabel}
           // variant="standard"
+          error={error.isError}
+          helperText={error.isError ? error.message : null}
           
           InputProps={{
             ...params.InputProps,

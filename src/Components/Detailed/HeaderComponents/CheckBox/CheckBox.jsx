@@ -48,7 +48,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
           try {
             const iTag = iLinkTag;
             const response = await getAutocomplete1(iTag)
-            const resultData = JSON.parse(response.result)
+            const resultData = JSON.parse(response?.result)
             if(resultData.length>0){
             
               

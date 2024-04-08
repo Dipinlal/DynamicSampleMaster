@@ -10,8 +10,8 @@ import Radio from './radio/Radio';
 
 
 const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,key1,sFieldId, type, HeaderInputValue, isMandatory, isDisabled,formDataHeader,label,iMaxSize,iLinkTag,isHeader,sDatatype,sDefaultValue,sErrorMsgConditions,
-  triggerValidation,resetTriggerVAlidation,onError
-}) => {
+  triggerValidation,resetTriggerVAlidation,onError,errorGlobal
+}) => {console.log(errorGlobal);
 
     const [value, setValue] = useState('');
     const [autoCompleteData, setAutoCompleteData] = useState({})//forAucomplete only
@@ -20,7 +20,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     const [checkBoxData, setcheckBoxData] = useState({})
     const [radioValue, setradioValue] = useState(null)
     const [checkedItems, setCheckedItems] = useState(formDataHeader[key1]);
-    const [fieldErrors, setFieldErrors] = useState({});
+    const [fieldErrors, setFieldErrors] = useState(errorGlobal || {});
 
  
     // const errorMessages = JSON.parse(sErrorMsgConditions)
@@ -33,7 +33,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     
       // Call onError prop with the error message if provided
       if (onError) {
-        onError(label, errorMessage);
+        onError(key1, errorMessage);
       }
     };
     const clearFieldError = (key) => {
@@ -45,6 +45,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
 
     const validateField = (val) => {
       let error = "";
+      let valueAsString = val.toString();
       
       if (sDatatype === "date") {
         if ((formDataHeader[key1]) && !doesDateExist(formDataHeader[key1])) {//added  formDataHeader[key1]) instead of datevalue and check only for valid entry not empty date. empty date allowed. if mandatory check using isMandatory
@@ -69,20 +70,20 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
          
         
     }
-    if (sDatatype === "number" && !bNegative && val.includes('-')) {
+    if (sDatatype === "number" && !bNegative && valueAsString.includes('-') && valueAsString.startsWith('-')) {
       error = `Negative value not allowed`;
-      val = val.replace('-', '');
+      valueAsString = valueAsString.replace('-', '');
   }
   else if (sDatatype === "integer") {
     // First, check if negative values are not allowed but a negative sign is attempted
-    if (!bNegative && val.startsWith('-')) {
+    if (!bNegative && valueAsString.startsWith('-')) {
       error = `Negative value not allowed`;
       // Optionally, you might want to remove the negative sign or leave it to show the error
-      val = val.replace('-', ''); // Remove the negative sign if you don't want it to appear at all
+      valueAsString = bNegative ? valueAsString.replace(/[^0-9-]/g, '') : valueAsString.replace(/[^0-9]/g, '');
     } 
     
     // Then, allow only digits (and negative sign if bNegative is true)
-    val = bNegative ? val.replace(/[^0-9-]/g, '') : val.replace(/[^0-9]/g, '');
+    val = bNegative ? valueAsString.replace(/[^0-9-]/g, '') : valueAsString.replace(/[^0-9]/g, '');
     
     const parsedInt = parseInt(val, 10);
     if (!isNaN(parsedInt)) {
@@ -92,13 +93,13 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     }
   }else if (sDatatype === "float") {
     // Allow numbers with decimal points, remove non-numeric characters except for a single decimal point
-    if (!bNegative && val.startsWith('-')) {
+    if (!bNegative && valueAsString.startsWith('-')) {
       error = `Negative value not allowed`;
-      val = val.replace('-', '');
+      valueAsString = valueAsString.replace('-', '');
     }
     // Replace anything that's not a number or more than one decimal point
     let decimalCount = 0;
-    val = val.split('').filter((char) => {
+    val = valueAsString.split('').filter((char) => {
       if (char === '.') {
         decimalCount += 1;
         return decimalCount <= 1; // Allow only one decimal point
@@ -121,6 +122,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
       selectedDate.setHours(0, 0, 0, 0);
       
       if (sErrorMsgConditions) {
+        try {
         const conditions = JSON.parse(sErrorMsgConditions);
 
         for (const condition of conditions) {
@@ -154,6 +156,10 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
           // If any error was found, break the loop
           if (errorMessage) break;
         }
+      } catch (e) {
+        console.error("Error parsing sErrorMsgConditions:", e);
+        // Handle error or set a default error message
+      }
       }
       const response = validateField(inputValue);
       const {error,val} = response
@@ -268,11 +274,6 @@ const handleChange = (e) => {
             HeaderInputValue(key1, numericalValue);
 
         }
-       
-        if(numericalValue){
-
-          HeaderInputValue(key1, numericalValue);
-        }
         else{
           HeaderInputValue(key1, newVal);
         }
@@ -351,7 +352,7 @@ const handleChange = (e) => {
   // To validate on saving
   useEffect(()=>{
     if(triggerValidation){
-      handleValidation()
+      handleValidation(formDataHeader[key1])
       resetTriggerVAlidation()
     }
    
@@ -539,6 +540,8 @@ const handleChange = (e) => {
               formDataHeader={formDataHeader}
               key1={key1}
               sFieldId={sFieldId}
+              triggerValidation={triggerValidation}
+              resetTriggerVAlidation={resetTriggerVAlidation}
 
               
 

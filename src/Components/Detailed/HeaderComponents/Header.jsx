@@ -3,7 +3,7 @@ import DynamicInputFieldHeader from './HeaderInputType'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-function Header({headerData,triggerValidation,resetTriggerVAlidation,handleFieldError,headerFormData,setheaderFormData}) {
+function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal,handleFieldError,headerFormData,setheaderFormData}) {
 
     
    
@@ -194,6 +194,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,handleField
                     triggerValidation={triggerValidation}
                     resetTriggerVAlidation={resetTriggerVAlidation}
                     onError={handleFieldError}
+                    errorGlobal={errorGlobal}
 
 
                 />
