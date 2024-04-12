@@ -18,7 +18,7 @@ const AutoCompleteFiles = ({
   isMandatory,
   disabled,
   iMaxSize,
-  iLinkTag,
+  iLinkTag
   // triggerValidation,
   // resetTriggerVAlidation
 
