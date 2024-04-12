@@ -19,8 +19,8 @@ const AutoCompleteFiles = ({
   disabled,
   iMaxSize,
   iLinkTag,
-  triggerValidation,
-  resetTriggerVAlidation
+  // triggerValidation,
+  // resetTriggerVAlidation
 
   
 }) => {
@@ -109,7 +109,7 @@ const AutoCompleteFiles = ({
               const iType =iTypeF2
               const iUser = iId;
               const iTag = iLinkTag;
-              console.log(iType);
+              
               const response = await getAutocomplete1(iTag,{iType,search:autoSearchKey})
               
               if(response?.result)
@@ -143,13 +143,13 @@ const AutoCompleteFiles = ({
       // }, [formDataHeader[key1],AutoMenu])
       
 
-     useEffect(() => {
-      if(triggerValidation){
-        validateInput(formData.sName)
-      }
+    //  useEffect(() => {
+    //   if(triggerValidation){
+    //     validateInput(formData.sName)
+    //   }
       
-      resetTriggerVAlidation()
-     }, [triggerValidation])
+    //   resetTriggerVAlidation()
+    //  }, [triggerValidation])
       
       
 

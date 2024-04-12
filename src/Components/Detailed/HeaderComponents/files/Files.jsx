@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import "./files.css"
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -8,6 +8,7 @@ import {
     TextField,
     Typography,
   } from "@mui/material";
+import AutoCompleteFiles from './AutoCompleteFiles';
 
   const textFieldStylye={
     "& .MuiOutlinedInput-input": {
@@ -56,8 +57,13 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
   const [fileNames, setFileNames] = useState([]);
   const [allFiles, setAllFiles] = useState([]);
   const [docType, setDocType] = useState('');
+  const [iDocType, setiDocType] = useState(0)
   const [refNo, setRefNo] = useState('');
   const [editFileIndex, seteditFileIndex] = useState(null)
+  const [autoCompleteData, setautoCompleteData] = useState({
+    sName:"",
+    iId:0
+  })
   
 
     const newFileRef = useRef();
@@ -101,7 +107,8 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
       setAllFiles(prevFiles => {
           const updatedFiles = [...prevFiles];
           updatedFiles[editFileIndex] = {
-              iDocType: docType,
+              sDocType: docType,
+              iDocType:iDocType,
               sRefNumber: refNo,
               filename: modifiedName,
               file: fileToAdd,
@@ -113,7 +120,8 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
     setAllFiles(prevFiles => [
       ...prevFiles,
       {
-        iDocType: docType, // Assuming docType is an id
+        sDocType: docType,
+        iDocType:iDocType, 
         sRefNumber: refNo,
         filename: modifiedName,
         file: fileToAdd, // Include the File object
@@ -130,6 +138,7 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
     setDocType("")
     setRefNo("")
     seteditFileIndex(null);
+    setautoCompleteData({sName:"",iId:0})
      
     }else{
      alert("select file")
@@ -176,8 +185,10 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
       document.body.removeChild(link);
     }
   };
-  const handleEdit = (index, fileObj) => {console.log(fileObj);
-   setDocType(fileObj?.iDocType??"")
+  const handleEdit = (index, fileObj) => {
+   setDocType(fileObj?.sDocType??"")
+   setiDocType(fileObj?.iDocType??0)
+   setautoCompleteData({...autoCompleteData,sName:fileObj.sDocType,iId:fileObj.iDocType})
    setRefNo(fileObj?.sRefNumber??"")
    const file = fileObj?.file;
     if (file) {
@@ -216,11 +227,19 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
    
     setFileNames(newFileNames);
   };
+
+  useEffect(() => {
+  
+    setDocType(autoCompleteData.sName)
+    setiDocType(autoCompleteData.iId)
+
+  }, [autoCompleteData])
+  
   return (
     <div className='filesmain'>
         <div className='filesmainD1'>
             
-            <TextField
+            {/* <TextField
           label={label}
           value={docType}
           onChange={(e) => setDocType(e.target.value)}
@@ -257,7 +276,21 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
         //   value={formDataHeader[key1]}
         //   onChange={handleChange}
         //   onBlur={handleBlur}
-        />
+        /> */}
+        <AutoCompleteFiles
+
+          formData={autoCompleteData}
+          setFormData={setautoCompleteData}
+          autoId="filesAutoComplete"
+          autoLabel={label}
+          isMandatory={isMandatory}
+          disabled={disabled}
+          iMaxSize="200"
+          iLinkTag="/Department/GetDepartment"
+          // triggerValidation
+          // resetTriggerVAlidation
+         
+         />
         <TextField
           label="Ref No."
           value={refNo}
@@ -354,7 +387,7 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
                           return (
                             <tr key={index}>
                             <td style={tableBodyStyle}>{index + 1}</td>
-                            <td style={tableBodyStyle}>{fileObj.iDocType}</td>
+                            <td style={tableBodyStyle}>{fileObj.sDocType}</td>
                             <td style={tableBodyStyle}>{fileObj.sRefNumber}</td>
                             <td style={tableBodyStyle}>
                               <DownloadIcon
