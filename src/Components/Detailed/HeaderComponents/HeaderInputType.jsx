@@ -5,13 +5,14 @@ import { Checkbox, FormControlLabel, TextField } from '@mui/material';
 import CustomSelect1 from './Select1';
 import CheckBox from './CheckBox/CheckBox';
 import Radio from './radio/Radio';
+import Files from './files/Files';
 
 
 
 
 const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,key1,sFieldId, type, HeaderInputValue, isMandatory, isDisabled,formDataHeader,label,iMaxSize,iLinkTag,isHeader,sDatatype,sDefaultValue,sErrorMsgConditions,
   triggerValidation,resetTriggerVAlidation,onError,errorGlobal
-}) => {console.log(errorGlobal);
+}) => {
 
     const [value, setValue] = useState('');
     const [autoCompleteData, setAutoCompleteData] = useState({})//forAucomplete only
@@ -596,6 +597,18 @@ const handleChange = (e) => {
             </span>
           }
         />
+        )
+        case "File":
+        return(
+          <Files
+         
+          sFieldName={key1}
+          label={label}
+          isMandatory={isMandatory}
+          formDataHeader={formDataHeader}
+          key1={key1}
+          disabled={isDisabled}
+          />
         )
           
       default:

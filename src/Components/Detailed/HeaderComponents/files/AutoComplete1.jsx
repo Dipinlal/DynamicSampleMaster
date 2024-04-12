@@ -3,7 +3,7 @@ import { Autocomplete, TextField, Typography,ListSubheader, Paper } from "@mui/m
 // import { buttonColor1 } from '../../../config';
 // import { GetAutocompleate } from '../../../apiHelper';
 import { useSelector } from 'react-redux';
-import { getAutocomplete, getAutocomplete1 } from '../../../Apis/Api';
+import { getAutocomplete, getAutocomplete1 } from '../../../../Apis/Api';
 
 
 
@@ -70,8 +70,8 @@ const AutoComplete1 = ({
     });
   // Effect to sync state with prop changes
   useEffect(() => {
-    setautoSearchKey(formDataHeader[sFieldName] || '');
-    setFormData({...formData,sName:formDataHeader[sFieldName]??"",iId:formDataHeader[sFieldId]??0})
+    setautoSearchKey('');
+    setFormData({})
     
   }, []);
 

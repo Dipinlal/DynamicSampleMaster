@@ -1,0 +1,79 @@
+.filesmain{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+    
+   
+
+}
+.filesmainD1{
+    width: 100%;
+   
+   
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px; /* This controls the space between fields */
+    padding: 0 00px; /* This adds space on the sides */
+     /* Adjust this value as needed */
+    margin: 0 auto; /* This centers the container */
+
+
+}
+.filesmainD2{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    
+}
+#fileTableHeade{
+    font-size: 16px;
+}
+@media (max-width: 419px) {
+    filesmainD1{
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+  
+  /* Between 420px and 767px - 2 columns */
+  @media (min-width: 420px) and (max-width: 767px) {
+    filesmainD1{
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Between 768px and 1023px - 2 columns */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    filesmainD1{
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Between 1024px and 1199px - 3 columns */
+  @media (min-width: 1024px) and (max-width: 1199px) {
+    filesmainD1{
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  /* Above 1200px - 4 columns */
+  @media (min-width: 1200px) {
+    filesmainD1{
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width:768px) {
+    .filesmainD2{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        
+    }
+    #fileTableHeade{
+        font-size: 12px;
+    }
+    
+  }

@@ -2,10 +2,22 @@ import React, { useEffect, useState } from 'react'
 import DynamicInputFieldHeader from './HeaderInputType'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 
 function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal,handleFieldError,headerFormData,setheaderFormData}) {
 
-    
+  const theme = createTheme({
+    components: {
+      MuiTab: {  // Make sure you have 'MuiTab' and not 'Tab' here
+        styleOverrides: {
+          root: {
+            textTransform: 'none', // Overrides the text transform to prevent uppercase
+          },
+        },
+      },
+    },
+  });
    
     const [selectedHeaderMain, setselectedHeaderMain] = useState("Main")
     const [formData, setformData] = useState(headerFormData)
@@ -113,7 +125,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
     //     })
 
     // }
-    const HeaderInputValue = (key, value, additionalValues = {}) => {console.log(key, value);
+    const HeaderInputValue = (key, value, additionalValues = {}) => {
       setformData(prev => ({
           ...prev,
           [key]: value,
@@ -128,6 +140,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
    }, [formData])
    
   return (
+    <ThemeProvider theme={theme}>
     <div className="CLTCS2">
     {/* <div className="CLTCS2D1">
 
@@ -135,14 +148,16 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
       <div onClick={()=>headerSelection("Attachments")} className={selectedHeaderMain === "Attachments"?"CLTCS2D1D1":"CLTCS2D1D2"}>Attachments</div>
 
     </div> */}
-    <Tabs value={activeTab} onChange={handleTabChange}>
+    <Tabs sx={{ textTransform: 'none' }} value={activeTab} onChange={handleTabChange}  variant="scrollable"
+  scrollButtons="auto"  // `auto` will only show scroll buttons when needed
+  allowScrollButtonsMobile> 
         {tabNames.map((tabName, index) => (
           <Tab label={tabName} value={index} key={tabName} />
         ))}
       </Tabs>
     {
       selectedHeaderMain ==="Main" &&
-      <div>
+      <div style={{marginTop:"8px"}}>
 
      
          {tabNames.map((tabName, index) => (
@@ -152,9 +167,10 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
           hidden={activeTab !== index}
           id={`tabpanel-${index}`}
           aria-labelledby={`tab-${index}`}
-          className="headInput-container"
+          className={tabName == "Attachments" ? "fileInput-container" : "headInput-container"}
         >
           {tabData[tabName] && activeTab === index && tabData[tabName].map((field) => (
+                
                 <DynamicInputFieldHeader
 
                     //api fields
@@ -206,6 +222,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
     }
     
     </div>
+    </ThemeProvider>
   )
 }
 
