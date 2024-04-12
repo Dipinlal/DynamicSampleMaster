@@ -9,22 +9,16 @@ import { getAutocomplete, getAutocomplete1 } from '../../../../Apis/Api';
 
 
 
-const AutoComplete1 = ({
+const AutoCompleteFiles = ({
  
   formData,
   setFormData,
-  width,
   autoId,
   autoLabel,
   isMandatory,
   disabled,
   iMaxSize,
   iLinkTag,
-  isHeader,
-  sFieldName,
-  formDataHeader,
-  key1,
-  sFieldId,
   triggerValidation,
   resetTriggerVAlidation
 
@@ -151,7 +145,7 @@ const AutoComplete1 = ({
 
      useEffect(() => {
       if(triggerValidation){
-        validateInput(formDataHeader[key1])
+        validateInput(formData.sName)
       }
       
       resetTriggerVAlidation()
@@ -170,7 +164,7 @@ const AutoComplete1 = ({
       options={AutoMenu}
       getOptionLabel={(option) => option && option.Name ? option.Name : ""}
       value={
-        AutoMenu.find((option) => option.Name === formDataHeader[sFieldName]) || null
+        AutoMenu.find((option) => option.Name === formData.sName) || null
       }
       onChange={handleAutocompleteChange}
       filterOptions={(options, { inputValue }) => {
@@ -315,4 +309,4 @@ const AutoComplete1 = ({
   );
 };
 
-export default AutoComplete1;
+export default AutoCompleteFiles;
