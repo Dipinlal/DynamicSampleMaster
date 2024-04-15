@@ -4,6 +4,7 @@ import { Autocomplete, TextField, Typography,ListSubheader, Paper } from "@mui/m
 // import { GetAutocompleate } from '../../../apiHelper';
 import { useSelector } from 'react-redux';
 import { getAutocomplete, getAutocomplete1 } from '../../../apis/Api';
+import { secondaryColorTheme } from '../../../config';
 
 
 
@@ -52,7 +53,7 @@ const AutoComplete1 = ({
       return (
         <ul style={{paddingTop:0}} ref={ref} {...other}>
           <ListSubheader
-            style={{ backgroundColor: "rgb(140, 153, 224)", padding: "5px" }}
+            style={{ backgroundColor:secondaryColorTheme, padding: "5px" }}
           >
             <div
               style={{

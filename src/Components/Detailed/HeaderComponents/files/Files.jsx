@@ -99,7 +99,7 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
 
     //   formData1.append("iType",11);
     // formData1.append("imageFiles", fileToAdd,modifiedName);
-    // const response = await UploadFiles(formData1);
+    // const response = await UploadFiles(master,formData1);
     
 
     if (editFileIndex !== null) {
