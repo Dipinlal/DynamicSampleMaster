@@ -78,8 +78,8 @@ const AutoComplete1 = ({
     const handleAutocompleteChange = (event, newValue) => {
         const updatedFormData = {
           ...formData,
-          sName: newValue ? newValue.Name : null,//"" was replaced by null
-          iId: newValue ? newValue.Id : null,//"" was replaced by null
+          sName: newValue ? newValue.Name : "",//"" was replaced by null
+          iId: newValue ? newValue.Id : 0,//"" was replaced by null
          
          
         };
@@ -101,6 +101,28 @@ const AutoComplete1 = ({
         }
       };
       
+      const fetchSelectedItem = async (fieldName) => {
+        try {
+          const config = {
+            headers: { "Content-Type": "application/json" },
+          };
+          const iType =iTypeF2
+              const iUser = iId;
+              const iTag = iLinkTag;
+          const response = await getAutocomplete1(iTag, { iType: iTypeF2, search: fieldName });
+          if (response?.result) {
+            const items = JSON.parse(response.result);
+            // Assuming the API returns an array, even if it's meant to fetch a single item
+            if (items.length > 0) {
+              return items[0]; // Return the first item if available
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch selected item:', error);
+        }
+        return null; // Return null if no item is found or in case of an error
+      };
+      
 
       //get AutoMenu
       useEffect(() => {
@@ -115,11 +137,23 @@ const AutoComplete1 = ({
               const iType =iTypeF2
               const iUser = iId;
               const iTag = iLinkTag;
-              console.log(iType);
+              
               const response = await getAutocomplete1(iTag,{iType,search:autoSearchKey})
               
-              if(response?.result)
-              setAutoMenu((JSON.parse(response.result)));
+              if (response?.result) {
+                const results = JSON.parse(response.result);
+                const currentSelection = results.find(option => option.Name === formDataHeader[sFieldName]);
+          
+                // Ensure the current selection is always in the menu
+                if (!currentSelection && formDataHeader[sFieldName]) {
+                  const selectedItem = await fetchSelectedItem(formDataHeader[sFieldName]);
+                  if (selectedItem) {
+                    results.unshift(selectedItem); // Add to the start of the list
+                  }
+                }
+                
+                setAutoMenu(results);
+              }
             } catch (error) {
               console.log(error);
             }
@@ -168,7 +202,7 @@ const AutoComplete1 = ({
     sx={{height:"35px", marginTop:"0px"}}
       id={autoId}
       options={AutoMenu}
-      getOptionLabel={(option) => option && option.Name ? option.Name : ""}
+      getOptionLabel={(option) => option?.Name ?? ""}
       value={
         AutoMenu.find((option) => option.Name === formDataHeader[sFieldName]) || null
       }
