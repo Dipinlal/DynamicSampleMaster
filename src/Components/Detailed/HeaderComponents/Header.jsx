@@ -95,6 +95,10 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
         const parsedValue = parseFloat(curr.sDefaultValue);
         acc[curr.sFieldName] = Number.isInteger(parsedValue) ? parsedValue : curr.sDefaultValue;
         break;
+      case 'bool':
+         
+          acc[curr.sFieldName] = parseInt(curr.sDefaultValue, 10);
+          break;  
       default:
         // For non-numeric types, use the default value directly
         acc[curr.sFieldName] = curr.sDefaultValue;
@@ -136,6 +140,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
      const data = {
       ...formData
      }
+     
      setheaderFormData(data)
    }, [formData])
    

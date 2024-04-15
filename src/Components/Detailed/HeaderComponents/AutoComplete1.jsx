@@ -3,7 +3,7 @@ import { Autocomplete, TextField, Typography,ListSubheader, Paper } from "@mui/m
 // import { buttonColor1 } from '../../../config';
 // import { GetAutocompleate } from '../../../apiHelper';
 import { useSelector } from 'react-redux';
-import { getAutocomplete, getAutocomplete1 } from '../../../Apis/Api';
+import { getAutocomplete, getAutocomplete1 } from '../../../apis/Api';
 
 
 
@@ -26,13 +26,16 @@ const AutoComplete1 = ({
   key1,
   sFieldId,
   triggerValidation,
-  resetTriggerVAlidation
+  resetTriggerVAlidation,
+  fieldErrors,
+  setFieldErrors,
+  
 
   
 }) => {
 
 
-    
+   
 
       const {iId} = useSelector((state)=>state.authState)
 
@@ -74,6 +77,10 @@ const AutoComplete1 = ({
     setFormData({...formData,sName:formDataHeader[sFieldName]??"",iId:formDataHeader[sFieldId]??0})
     
   }, []);
+  useEffect(() => {
+   setError({ isError: true, message: [fieldErrors[sFieldName]] })
+  }, [fieldErrors[sFieldName]])
+  
 
     const handleAutocompleteChange = (event, newValue) => {
         const updatedFormData = {
@@ -86,20 +93,20 @@ const AutoComplete1 = ({
         
         setFormData(updatedFormData); // This will now update the parent's state
         setiTypeF2(1)
-        if (isMandatory && !newValue) {
-          setError({ isError: true, message: 'This field is required.' });
-        } else {
-          setError({ isError: false, message: '' });
-        }
+        // if (isMandatory && !newValue) {
+        //   setError({ isError: true, message: 'This field is required.' });
+        // } else {
+        //   setError({ isError: false, message: '' });
+        // }
       
       }
-      const validateInput = (newValue) => {
-        if (isMandatory && !newValue) {
-          setError({ isError: true, message: 'This field is required.' });
-        } else {
-          setError({ isError: false, message: '' });
-        }
-      };
+      // const validateInput = (newValue) => {
+      //   if (isMandatory && !newValue) {
+      //     setError({ isError: true, message: 'This field is required.' });
+      //   } else {
+      //     setError({ isError: false, message: '' });
+      //   }
+      // };
       
       const fetchSelectedItem = async (fieldName) => {
         try {
@@ -183,13 +190,13 @@ const AutoComplete1 = ({
       // }, [formDataHeader[key1],AutoMenu])
       
 
-     useEffect(() => {
-      if(triggerValidation){
-        validateInput(formDataHeader[key1])
-      }
+    //  useEffect(() => {
+    //   if(triggerValidation){
+    //     validateInput(formDataHeader[key1])
+    //   }
       
-      resetTriggerVAlidation()
-     }, [triggerValidation])
+    //   resetTriggerVAlidation()
+    //  }, [triggerValidation])
       
       
 

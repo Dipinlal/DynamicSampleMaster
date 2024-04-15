@@ -8,7 +8,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
 
     const [formData, setformData] = useState({})
     const [companyList, setcompanyList] = useState([]);
-    const [companyListExist, setCompanyListExist] = useState(formDataHeader[key1]);
+    const [companyListExist, setCompanyListExist] = useState(formDataHeader[key1]??"");
     const [changesTriggered, setchangesTriggered] = useState(false);
     const handleSelectedIds = useCallback(
         (selectedIds, params, selectedTitles) => {
@@ -19,7 +19,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
         },
         []
       );
-      
+     
       useEffect(() => {
         setcheckBoxData(formData)
       }, [formData])

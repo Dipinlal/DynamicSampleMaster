@@ -29,20 +29,20 @@
   .radiomainD1BoxMS {
     /* Fixed width */
    
-     flex-direction: column;
-     
-     
-     
-     overflow: auto;
-     
     
-   
+     display: flex;
+     width: 100%;
+     justify-content:space-between;
+     overflow: auto;
+    
+    
+  
     
      box-sizing: border-box; /* Include padding and border in the width */
    }
    #radiomainD1CI1{
     font-size: 12px;
-    margin-bottom: 5px;
+   
     margin-left: 5px;
    }
    #inputwrapperSB{

@@ -99,7 +99,7 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
 
     //   formData1.append("iType",11);
     // formData1.append("imageFiles", fileToAdd,modifiedName);
-    // const response = await FileUploadChatBox(formData1);
+    // const response = await UploadFiles(formData1);
     
 
     if (editFileIndex !== null) {
@@ -185,6 +185,7 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
       document.body.removeChild(link);
     }
   };
+  
   const handleEdit = (index, fileObj) => {
    setDocType(fileObj?.sDocType??"")
    setiDocType(fileObj?.iDocType??0)
@@ -286,7 +287,7 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
           isMandatory={isMandatory}
           disabled={disabled}
           iMaxSize="200"
-          iLinkTag="/Department/GetDepartment"
+          iLinkTag="/Employee/GetDocumentType"
           // triggerValidation
           // resetTriggerVAlidation
          

@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { getAutocomplete1 } from '../../../../Apis/Api';
-import { Typography } from '@mui/material';
+import { getAutocomplete1 } from '../../../../apis/Api';
+import { IconButton, Typography } from '@mui/material';
 import "./radiocss.css"
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 
 function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,formDataHeader,key1,disabled}) {
 
-    const [formData, setformData] = useState(formDataHeader)
+    
     const [companyList, setcompanyList] = useState([]);
     const [changesTriggered, setchangesTriggered] = useState(false);
-    const [selectedCompanyId, setSelectedCompanyId] = useState(formDataHeader[key1]);
+    const [selectedCompanyId, setSelectedCompanyId] = useState(formDataHeader[key1]??0);
    
     
       useEffect(() => {
-        setradioValue(formData)
-      }, [formData])
+        setradioValue(selectedCompanyId)
+      }, [selectedCompanyId])
       
       const resetChangesTrigger = () => {
         setchangesTriggered(false);
@@ -58,10 +59,7 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
         const selectedId = parseInt(event.target.value, 10);
        
         setSelectedCompanyId(selectedId);
-        setformData(prevFormData => ({
-            ...prevFormData,
-            [sFieldName]: selectedId,
-        }));
+        
     };
     
   return (
@@ -69,7 +67,12 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
         {companyList.length > 0 && (
                 <div className="radiomainD1">
                   <div className="radiomainD1C">
-                    <span style={{display:"flex",flexDirection:"row",alignItems:"center"}}><Typography id="radiomainD1CI1">{label}</Typography>{isMandatory && <h1 style={{color:"red",fontSize:"18px"}}>*</h1>}</span>
+                    <span style={{display:"flex",flexDirection:"row",alignItems:"center",marginBottom:"5px"}}><Typography id="radiomainD1CI1">{label}</Typography>{isMandatory && <IconButton  sx={{
+    color: "red",
+    
+   
+    padding: 0, // You can adjust padding to further control the size
+  }}  ><RadioButtonCheckedIcon sx={{color:"red",fontSize:"18px"}}/></IconButton>}</span>
                     <div className="radiomainD1BoxM">
                       <div
                         //  style={
@@ -80,7 +83,7 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
                         className="radiomainD1BoxMS"
                       >
                         {companyList.map(company => (
-                                    <label key={company.Id}>
+                                    <label style={{display:"flex",flexDirection:"row",alignItems:"center",gap:"1px"}} key={company.Id}>
                                         <input
                                             type="radio"
                                             name={sFieldName}

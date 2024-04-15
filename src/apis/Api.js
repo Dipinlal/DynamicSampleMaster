@@ -60,6 +60,7 @@ api.interceptors.response.use(
         return axios.request(error.config);
       } catch (refreshError) {
         console.error("Failed to refresh token", refreshError);
+        window.location.href = '/';
       }
     }
     return Promise.reject(error);
@@ -80,7 +81,7 @@ const makeAuthorizedRequest = async (method,url, params) => {
     }else{
       response= await api.post(url,params, {
         headers: {
-          "Content-Type": "application/json",
+          // "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
@@ -141,6 +142,9 @@ export const getAutocomplete1 = async (itag,params) => {
     // const response = await axios.get(`${BASE_URL}${itag}`,headers)
     // return response;
 };
+export const UploadFiles = async (formData) => {
+  return makeAuthorizedRequest("post","/Employee/UploadFiles?master=Customer",formData);
+};
 
 
 export const postEmployee = async (payload) => {
@@ -160,3 +164,4 @@ export const postEmployee = async (payload) => {
 export const getEmployeeSummary = async () => {
   return makeAuthorizedRequest("get","/Employee/GetEmployees");
 };
+

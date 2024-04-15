@@ -15,7 +15,7 @@ import Header from "./HeaderComponents/Header";
 import Body from "./BodyComponents/Body";
 import AlertBox from "../AlertBox/AlertBox"
 import { Savings } from "@mui/icons-material";
-import { getFields, postEmployee } from "../../Apis/Api";
+import { getFields } from "../../apis/Api";
 
 function Detailed() {
 
@@ -44,7 +44,7 @@ function Detailed() {
     const iDocType = location.state?.iDoctype;
     
 
-    const handleFieldError = (fieldKey, errorMessage) => {console.log(fieldKey, errorMessage);
+    const handleFieldError = (fieldKey, errorMessage) => {
       setFieldErrors(prevErrors => ({
         ...prevErrors,
         [fieldKey]: errorMessage,
@@ -346,24 +346,71 @@ function Detailed() {
     
   };
   const validateAllFields = (headerData, headerFormData) => {
+    
     let allValid = true;
     headerData.forEach((field) => {
-      if (field.bDisplayed && field.bMandatory) {
+      
+        let errorMessage = "";
         const fieldKey = field.sFieldName;
+        const today = new Date();
+        const selectedDate = new Date(headerFormData[fieldKey]); //added  formDataHeader[key1]) instead of datevalue
+        today.setHours(0, 0, 0, 0); // Normalize today's date for comparison
+        selectedDate.setHours(0, 0, 0, 0); 
         const value = headerFormData[fieldKey];
-        if (!value || value.toString().trim() === '') {
+        if (field.sErrorMsgConditions) {
+          try {
+          const conditions = JSON.parse(field.sErrorMsgConditions);
+  
+          for (const condition of conditions) {
+            switch (condition.errorcondition) {
+              case "Empty":
+                if (value === undefined || value === null || value =="0" || value ==0 ||  (typeof value === 'string' && !value.trim())) {
+                  errorMessage = condition.message;
+                }
+                break;
+              case "maxlength":
+                if (value.length > field.iMaxSize) {
+                  errorMessage = condition.message;
+                  
+                }
+                break;
+              case "Before":
+                // Assuming inputValue is a date string in the format 'YYYY-MM-DD'
+                if (new Date(selectedDate) < today) {
+                  errorMessage = condition.message;
+                }
+                break;
+              case "After":
+                if (new Date(selectedDate) > new Date(today)) {
+                  errorMessage = condition.message;
+                }
+                break;
+              // ... handle other conditions
+              default:
+                break;
+            }
+            // If any error was found, break the loop
+            if (errorMessage) break;
+          }
+        } catch (e) {
+          console.error("Error parsing sErrorMsgConditions:", e);
+          // Handle error or set a default error message
+        }
+        }
+        if (errorMessage) {
           // If the mandatory field is empty, set an error
-          handleFieldError(fieldKey, `${field.sFieldCaption} is required`);
+          handleFieldError(fieldKey, errorMessage);
           allValid = false;
         }
-      }
+      
     });
     return allValid;
   };
+  
   const handleSaveClick = async () => {
     setsaveValidation(true); // Trigger the validation
     const allFieldsValidated = validateAllFields(headerData, headerFormData);
-    console.log(allFieldsValidated);
+    
     if (allFieldsValidated) {
       setAlertMessage(`No error`);
         setShowAlert(true);
@@ -376,7 +423,7 @@ function Detailed() {
     } else {
          const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
  
-    console.log(fieldErrors);
+    
       if (errorsArray.length > 0) {
         // Show first error or all errors concatenated, depending on your UI design
         const [firstErrorKey, firstErrorMessage] = errorsArray[0];

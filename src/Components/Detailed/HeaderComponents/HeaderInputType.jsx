@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import AutoComplete from './AutoComplete';
 import AutoComplete1 from './AutoComplete1';
-import { Checkbox, FormControlLabel, TextField } from '@mui/material';
+import { Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import CustomSelect1 from './Select1';
 import CheckBox from './CheckBox/CheckBox';
 import Radio from './radio/Radio';
@@ -14,16 +14,15 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
   triggerValidation,resetTriggerVAlidation,onError,errorGlobal
 }) => {
 
-    const [value, setValue] = useState('');
-    const [autoCompleteData, setAutoCompleteData] = useState({})//forAucomplete only
+    
+    const [autoCompleteData, setAutoCompleteData] = useState({sName:"",iId:0})//forAucomplete only
 
-    const [isError, setError] = useState(false);
+   
     const [checkBoxData, setcheckBoxData] = useState({})
-    const [radioValue, setradioValue] = useState(null)
-    const [checkedItems, setCheckedItems] = useState(formDataHeader[key1]);
+    const [radioValue, setradioValue] = useState(0)
+    const [checkedItems, setCheckedItems] = useState({});
     const [fieldErrors, setFieldErrors] = useState(errorGlobal || {});
 
- 
     // const errorMessages = JSON.parse(sErrorMsgConditions)
     
     const handleError = (errorMessage) => {
@@ -46,7 +45,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
 
     const validateField = (val) => {
       let error = "";
-      let valueAsString = val.toString();
+      let valueAsString = val?.toString();
       
       if (sDatatype === "date") {
         if ((formDataHeader[key1]) && !doesDateExist(formDataHeader[key1])) {//added  formDataHeader[key1]) instead of datevalue and check only for valid entry not empty date. empty date allowed. if mandatory check using isMandatory
@@ -129,9 +128,9 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
         for (const condition of conditions) {
           switch (condition.errorcondition) {
             case "Empty":
-              if (!inputValue.trim()) {
-                errorMessage = condition.message;
-              }
+              if (inputValue === undefined || inputValue === null ||  inputValue === 0 ||(typeof inputValue === 'string' && !inputValue.trim())) {
+                  errorMessage = condition.message;
+                }
               break;
             case "maxlength":
               if (inputValue.length > iMaxSize) {
@@ -175,7 +174,52 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
       return newInputvalue
     };
     
+    const handleValidationAutocomplete = (inputValue) => {
+      let errorMessage = "";
+     
+     
+     
     
+      if (sErrorMsgConditions) {
+        try {
+        const conditions = JSON.parse(sErrorMsgConditions);
+
+        for (const condition of conditions) {
+          switch (condition.errorcondition) {
+            case "Empty":
+              if (inputValue === undefined || inputValue === null ||  inputValue === 0 ||(typeof inputValue === 'string' && !inputValue.trim())) {
+                  errorMessage = condition.message;
+                }
+              break;
+            case "maxlength":
+              if (inputValue.length > iMaxSize) {
+                errorMessage = condition.message;
+               
+              }
+              break;
+            
+              break;
+            // ... handle other conditions
+            default:
+              break;
+          }
+          // If any error was found, break the loop
+          if (errorMessage) break;
+        }
+      } catch (e) {
+        console.error("Error parsing sErrorMsgConditions:", e);
+        // Handle error or set a default error message
+      }
+      }
+      
+      
+     
+      
+    
+      
+      handleError(errorMessage);
+      
+    };
   
 
  //Validate date
@@ -291,6 +335,7 @@ const handleChange = (e) => {
     useEffect(() => {
      
       if(autoCompleteData && type ==="Autocomplete"){
+       // handleValidationAutocomplete(autoCompleteData?.sName)
       if(autoCompleteData?.sName){
         const name=autoCompleteData?.sName
         const id =autoCompleteData?.iId
@@ -339,9 +384,11 @@ const handleChange = (e) => {
      
       if(type ==="Radio"){
         if(radioValue){
-        HeaderInputValue(key1,radioValue[key1])
+         // handleValidationAutocomplete(radioValue[key1])
+        HeaderInputValue(key1,radioValue)
       }
       else{
+        
         HeaderInputValue(key1,0)
         
       }
@@ -367,8 +414,30 @@ const handleChange = (e) => {
         ...checkedItems,
         [itemName]: isChecked, // Update the state with the new checked status
     });
+    handleValidationAutocomplete(isChecked)
     HeaderInputValue(key1,isChecked)
 }
+
+useEffect(() => {
+  if(type ==="CheckBox" && (triggerValidation )){
+   
+    
+    handleValidationAutocomplete(checkedItems[key1])
+  }
+  else if(autoCompleteData && type ==="Autocomplete" && (triggerValidation || formDataHeader[key1]!==autoCompleteData.sName)){
+    handleValidationAutocomplete(autoCompleteData?.sName)
+  }  
+  else if(type ==="Radio" && radioValue && (triggerValidation || formDataHeader[key1]!=radioValue)){
+      handleValidationAutocomplete(radioValue)
+  }    
+}, [checkedItems,autoCompleteData,radioValue,triggerValidation])
+
+useEffect(() => {
+  if(type  === "CheckBox"){
+    setCheckedItems({[key1]:formDataHeader[key1]})
+  }
+}, [])
+
 
  
     switch (type) {
@@ -543,14 +612,16 @@ const handleChange = (e) => {
               sFieldId={sFieldId}
               triggerValidation={triggerValidation}
               resetTriggerVAlidation={resetTriggerVAlidation}
-
+              fieldErrors={fieldErrors}
+              setFieldErrors={setFieldErrors}
+              sErrorMsgConditions={sErrorMsgConditions}
               
 
             />
           );  
 
         case "CheckBoxes":
-          return(
+          return(<div style={{ marginBottom: '16px' }}>
             <CheckBox
             iLinkTag={iLinkTag}
             sFieldName={key1}
@@ -562,9 +633,15 @@ const handleChange = (e) => {
             key1={key1}
             disabled={isDisabled}
             />
+            {fieldErrors[key1] && (
+              <div style={{ color: '#D32F2F'}}>
+                <Typography sx={{fontSize:"12px"}}>{fieldErrors[key1]}</Typography>
+                
+              </div>
+            )}</div>
           )
       case "Radio":
-        return(
+        return(<div style={{ marginBottom: '16px' }}>
           <Radio
           iLinkTag={iLinkTag}
           sFieldName={key1}
@@ -576,9 +653,16 @@ const handleChange = (e) => {
           key1={key1}
           disabled={isDisabled}
           />
+          {fieldErrors[key1] && (
+            <div style={{ color: '#D32F2F'}}>
+              <Typography sx={{fontSize:"12px"}}>{fieldErrors[key1]}</Typography>
+              
+            </div>
+          )}
+          </div>
         )
         case "CheckBox":
-        return(
+        return(<div style={{ marginBottom: '16px' }}>
           <FormControlLabel
           control={
             <Checkbox
@@ -586,6 +670,11 @@ const handleChange = (e) => {
              onChange={handleItemToggle}
              disabled={isDisabled}
              name={key1}
+             sx={{
+              color: isMandatory ? 'red' : 'default', // default is typically grey
+              
+              
+            }}
              
 
              
@@ -597,7 +686,13 @@ const handleChange = (e) => {
             </span>
           }
         />
-        )
+        {fieldErrors[key1] && (
+        <div style={{ color: '#D32F2F'}}>
+          <Typography sx={{fontSize:"12px"}}>{fieldErrors[key1]}</Typography>
+          
+        </div>
+      )}
+        </div>)
         case "File":
         return(
           <Files
