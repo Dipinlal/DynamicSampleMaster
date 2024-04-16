@@ -3,6 +3,7 @@ import DynamicInputFieldHeader from './HeaderInputType'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CircularProgress from '@mui/material/CircularProgress'; // For showing a loading spinner
 
 
 function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal,handleFieldError,headerFormData,setheaderFormData}) {
@@ -26,6 +27,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
     const [activeTab, setActiveTab] = useState(0);
     const [tabNames, setTabNames] = useState([]);
     const [tabData, settabData] = useState([])
+    const [loading, setloading] = useState(false)
     
   
     //for grouping
@@ -144,6 +146,11 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
      setheaderFormData(data)
    }, [formData])
    
+ if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+    </div>;
+}
   return (
     <ThemeProvider theme={theme}>
     <div className="CLTCS2">
@@ -165,14 +172,17 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
       <div style={{marginTop:"8px"}}>
 
      
-         {tabNames.map((tabName, index) => (
+{tabNames.map((tabName, index) => {
+  // Check if the first item exists and if its sFieldName is 'attachments'
+  const isAttachments = tabData[tabName] && tabData[tabName][0] && tabData[tabName][0].sFieldName === "attachments";
+  return (
         <div
           key={tabName}
           role="tabpanel"
           hidden={activeTab !== index}
           id={`tabpanel-${index}`}
           aria-labelledby={`tab-${index}`}
-          className={tabName == "Attachments" ? "fileInput-container" : "headInput-container"}
+          className={isAttachments  ? "fileInput-container" : "headInput-container"}
         >
           {tabData[tabName] && activeTab === index && tabData[tabName].map((field) => (
                 
@@ -221,7 +231,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
                 />
                 ))}
                 </div>
-              ))}
+              )})}
       </div>
       
     }

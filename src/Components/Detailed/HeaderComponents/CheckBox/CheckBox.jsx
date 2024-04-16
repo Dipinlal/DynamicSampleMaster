@@ -23,7 +23,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
       useEffect(() => {
         setcheckBoxData(formData)
       }, [formData])
-      
+      console.log(formDataHeader[key1],checkBoxData);
       const resetChangesTrigger = () => {
         setchangesTriggered(false);
       };
@@ -48,27 +48,30 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
           try {
             const iTag = iLinkTag;
             const response = await getAutocomplete1(iTag)
-            const resultData = JSON.parse(response?.result)
-            if(resultData.length>0){
-            
+            if(response?.result){
+              const resultData = JSON.parse(response?.result)
+              if(resultData.length>0){
               
-                const formattedData = resultData.map((item) => ({
-                  title: item.Name,
-                  iId: item.Id,
-                }));
-                setcompanyList(formattedData);
+                
+                  const formattedData = resultData.map((item) => ({
+                    title: item.Name,
+                    iId: item.Id,
+                  }));
+                  setcompanyList(formattedData);
+                
+             
+             
+             
+             
+              return;
+            }else{
+              setcompanyList([])
+              setloading(false)
+              return
+      
+            }
+            }
               
-           
-           
-           
-           
-            return;
-          }else{
-            setcompanyList([])
-            setloading(false)
-            return
-    
-          }   
             
           } catch (error) {
             console.log(error);

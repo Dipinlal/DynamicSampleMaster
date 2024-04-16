@@ -33,6 +33,15 @@ function Detailed() {
     name:"Edit",cityId:9,cityName:"BERLIN",departmentCheck:"1,2,3,4",
     
   })
+  const changeHeaderFormData = (newFormData)=>{
+  
+    setheaderFormData(prevFormData => ({
+      ...prevFormData,
+      ...newFormData
+    }));
+
+  }
+  
   const [saving, setsaving] = useState(false)
 
 
@@ -511,7 +520,7 @@ function Detailed() {
         
       </div>
       <Header headerData={headerData} triggerValidation={saveValidation} resetTriggerVAlidation={resetSavevalidation}  handleFieldError={handleFieldError} errorGlobal={fieldErrors}
-  resetFieldErrors={resetFieldErrors} headerFormData={headerFormData} setheaderFormData={setheaderFormData}
+  resetFieldErrors={resetFieldErrors} headerFormData={headerFormData} setheaderFormData={changeHeaderFormData}
     />
      
     </div>

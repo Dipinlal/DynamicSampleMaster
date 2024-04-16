@@ -26,7 +26,8 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
           try {
             const iTag = iLinkTag;
             const response = await getAutocomplete1(iTag)
-            const resultData = JSON.parse(response.result)
+            if(response?.result){
+              const resultData = JSON.parse(response?.result)
             if(resultData.length>0){
             
               
@@ -47,6 +48,9 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
             return
     
           }   
+
+            }
+            
             
           } catch (error) {
             console.log(error);
