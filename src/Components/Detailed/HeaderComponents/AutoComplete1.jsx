@@ -147,9 +147,11 @@ const AutoComplete1 = ({
               const iTag = iLinkTag;
               
               const response = await getAutocomplete1(iTag,{iType,search:autoSearchKey})
-              
+             
               if (response?.result) {
+               
                 const results = JSON.parse(response.result);
+                if(results.length>0){
                 const currentSelection = results.find(option => option.Name === formDataHeader[sFieldName]);
           
                 // Ensure the current selection is always in the menu
@@ -161,6 +163,12 @@ const AutoComplete1 = ({
                 }
                 
                 setAutoMenu(results);
+              }
+              else {
+                // If resultData is empty but not an error, keep the old companyList
+                setAutoMenu(prevMenuList => prevMenuList.length > 0 ? prevMenuList : []);
+              }
+                
               }
             } catch (error) {
               console.log(error);

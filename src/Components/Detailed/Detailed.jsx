@@ -30,7 +30,8 @@ function Detailed() {
   const [alertcolor, setalertcolor] = useState("#000000")
   const [fieldErrors, setFieldErrors] = useState({});
   const [headerFormData, setheaderFormData] = useState({
-    name:"Edit",cityId:9,cityName:"BERLIN",departmentCheck:"1,2,3,4",
+    name:"Edit",cityId:9,cityName:"BERLIN",departmentDetails:[{id:1},{id:2}]
+
     
   })
   const changeHeaderFormData = (newFormData)=>{
@@ -373,7 +374,7 @@ function Detailed() {
           for (const condition of conditions) {
             switch (condition.errorcondition) {
               case "Empty":
-                if (value === undefined || value === null || value =="0" || value ==0 ||  (typeof value === 'string' && !value.trim())) {
+                if (value === undefined ||value === false || value === null || value =="0" || value ==0 ||  (typeof value === 'string' && !value.trim())) {
                   errorMessage = condition.message;
                 }
                 break;

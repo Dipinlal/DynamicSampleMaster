@@ -29,7 +29,7 @@ const Item = styled("div")`
   }
 `;
 
-const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,changeTriggered,setchangesTriggered,initialCheckedIds = [],disabled}) => {
+const SearchBox = React.memo(({ initialItems, search ,handleSelectedIds, params,changeTriggered,setchangesTriggered,initialCheckedIds = "",disabled}) => {
 
   
   
@@ -106,10 +106,11 @@ useEffect(() => {
 }, [changeTriggered, initialItems]);
 
 useEffect(() => {
+  const checkedIdsArray = initialCheckedIds.split(',').map(id => id.trim());
   // Initialize items based on initialCheckedIds
   const newItems = initialItems.reduce((acc, item) => ({
     ...acc,
-    [item.iId]: initialCheckedIds.includes(String(item.iId)), // Check if the iId is in initialCheckedIds
+    [item.iId]: checkedIdsArray.includes(String(item.iId)), // Check if the iId is in initialCheckedIds
   }), {});
 
   setItems(newItems);

@@ -28,96 +28,214 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
     const [tabNames, setTabNames] = useState([]);
     const [tabData, settabData] = useState([])
     const [loading, setloading] = useState(false)
+    const [dataInitialized, setDataInitialized] = useState(false);
+    
+  console.log(errorGlobal);
+
+    // Asynchronous effect to fetch and process data
+    useEffect(() => {
+      async function loadData() {
+         
+          try {
+              setloading(true);
+              // Simulate async data fetching
+              const processedData = await processHeaderData(headerData);
+              setTabNames(Object.keys(processedData));
+              settabData(processedData);
+              initializeFormData(headerData);
+          } catch (error) {
+              console.error('Error processing header data:', error);
+              
+          }
+          setloading(false);
+      }
+      loadData();
+  }, [headerData]);
+
+  // Simulated async function to process header data
+  const processHeaderData = async (headerData) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const groupedData = headerData
+                .filter(field => field.bDisplayed)
+                .sort((a, b) => a.iFieldOrder - b.iFieldOrder)
+                .reduce((acc, field) => {
+                    const tabName = field.sTabName || 'Default';
+                    if (!acc[tabName]) acc[tabName] = [];
+                    acc[tabName].push(field);
+                    return acc;
+                }, {});
+            resolve(groupedData);
+        }, 1000); // simulate delay
+    });
+};
+function initializeFormData(fields) {
+  const initialData = fields.reduce((acc, field) => {
+      // If formData already has a value for this field, use it. Otherwise, set to default or empty.
+     
+      if(field.sType == "Autocomplete"){
+      const existingValue = headerFormData[field.sFieldName];
+      const existingId = headerFormData[field.sFieldId]
+        if (existingValue !== undefined) {
+
+          acc[field.sFieldId] = existingId
+          acc[field.sFieldName] = existingValue
+          } else { 
+            acc[field.sFieldId] = 0
+            acc[field.sFieldName] = ""
+          }
+        
+        
+      }
+      else{
+      acc[field.sFieldName] = headerFormData[field.sFieldName] ?? getDefaultValue(field);
+      }
+      return acc;
+  }, {});
+  setformData(initialData);
+  setheaderFormData(initialData);
+  setDataInitialized(true);
+  localStorage.setItem('headerFormData', JSON.stringify(initialData));
+}
+
+function getDefaultValue(field) {
+let parsedValue;
+  switch (field.sDatatype) {
+    case "integer":
+      parsedValue = parseInt(field.sDefaultValue, 10);
+      return !isNaN(parsedValue) ? parsedValue : null;
+    case "float":
+      parsedValue = parseFloat(field.sDefaultValue);
+      return !isNaN(parsedValue) ? parsedValue : null;
+    case "number":
+      parsedValue = parseFloat(field.sDefaultValue);
+      return !isNaN(parsedValue) ? parsedValue : null;
+    case "bool":
+      const boolValue = parseInt(field.sDefaultValue, 10);
+      return boolValue === 1 ? true : false;
+    case "array":
+      try {
+        // Attempt to parse the string as JSON to convert it into an array
+        const arrayValue = JSON.parse(field.sDefaultValue);
+        // Check if the parsed value is indeed an array
+        return Array.isArray(arrayValue) ? arrayValue : [];
+      } catch (e) {
+        // If there's an error during parsing, return an empty array
+        return [];
+      }
+    default:
+      return field.sDefaultValue !== null ? field.sDefaultValue : "";
+  }
+}
+
+    //for grouping
+    // useEffect(() => {
+    //   const groupedData = headerData
+    //     .filter((field) => field.bDisplayed) // Consider only displayed fields
+    //     .sort((a, b) => a.iFieldOrder - b.iFieldOrder) // Sort by field order
+    //     .reduce((acc, field) => {
+    //       // Group fields by sTabName
+    //       const tabName = field.sTabName || 'Default'; // Handle fields with no sTabName
+    //       if (!acc[tabName]) {
+    //         acc[tabName] = [];
+    //       }
+    //       acc[tabName].push(field);
+    //       return acc;
+    //     }, {});
+  
+    //   setTabNames(Object.keys(groupedData)); // Set tab names for rendering tabs
+    //   settabData(groupedData); // Set sorted and grouped fields for display
+    // }, [headerData]);
+
+
+    const handleTabChange = (event, newValue) => {
+     
+        if (!loading && dataInitialized) {
+            setActiveTab(newValue);
+            setloading(true);
+            setTimeout(() => {
+              // Let's assume data processing is done here.
+              setloading(false);
+          }, 1000); 
+        }
+    
+      // Set loading to true here to indicate data processing/loading is starting
     
   
-    //for grouping
-    useEffect(() => {
-      const groupedData = headerData
-        .filter((field) => field.bDisplayed) // Consider only displayed fields
-        .sort((a, b) => a.iFieldOrder - b.iFieldOrder) // Sort by field order
-        .reduce((acc, field) => {
-          // Group fields by sTabName
-          const tabName = field.sTabName || 'Default'; // Handle fields with no sTabName
-          if (!acc[tabName]) {
-            acc[tabName] = [];
-          }
-          acc[tabName].push(field);
-          return acc;
-        }, {});
-  
-      setTabNames(Object.keys(groupedData)); // Set tab names for rendering tabs
-      settabData(groupedData); // Set sorted and grouped fields for display
-    }, [headerData]);
-    const handleTabChange = (event, newValue) => {
-      setActiveTab(newValue);
-    };
-  
-
-   
- 
-  // Reset errors when needed, such as on successful save or field value change
- 
-    useEffect(() => {
-      if (headerData && Array.isArray(headerData)) {
-          const newFormData = headerData.reduce((acc, curr) => {
-            const existingValue = formData[curr.sFieldName];
-            const existingId = formData[curr.sFieldId]
-              if(curr.sType == "Autocomplete"){
-                if (existingValue !== undefined) {
-
-                  acc[curr.sFieldId] = existingId
-                  acc[curr.sFieldName] = existingValue
-                  } else { 
-                    acc[curr.sFieldId] = 0
-                    acc[curr.sFieldName] = ""
-                  }
-                
-                
-              }
-              
-              else if (curr.sFieldName) {
-                if (existingValue !== undefined) {
-                  // If there's an existing value, preserve it
-                  acc[curr.sFieldName] = existingValue;
-              } else {
-                  // Initialize field based on its data type
-  if (curr.sDefaultValue !== undefined) {
-    // Handle default value based on the specified data type
-    switch (curr.sDatatype) {
-      case 'integer':
-        // Parse sDefaultValue to integer and store as number
-        acc[curr.sFieldName] = parseInt(curr.sDefaultValue, 10);
-        break;
-      case 'float':
-        // Store sDefaultValue as is to preserve formatting like "0.00"
-        acc[curr.sFieldName] = parseFloat(curr.sDefaultValue);
-        break;
-      case 'number':
-        // Try to parse as float first, then decide if integer format is needed
-        const parsedValue = parseFloat(curr.sDefaultValue);
-        acc[curr.sFieldName] = Number.isInteger(parsedValue) ? parsedValue : curr.sDefaultValue;
-        break;
-      case 'bool':
-         
-          acc[curr.sFieldName] = parseInt(curr.sDefaultValue, 10);
-          break;  
-      default:
-        // For non-numeric types, use the default value directly
-        acc[curr.sFieldName] = curr.sDefaultValue;
-    }
-  } else {
-    // Fallback for when there's no default value specified, ensuring numeric types get 0
-    acc[curr.sFieldName] = (curr.sDatatype === 'number' || curr.sDatatype === 'integer' || curr.sDatatype === 'float') ? 0 : "";
-  }
-              }
-              }
-              
-              return acc;
-          }, {});
-        
-          setformData(prevFormData => ({ ...prevFormData, ...newFormData }));
+      // Simulate or actually load data here. For now, I will simulate a delay to represent processing.
+      else{
+        setTimeout(() => {
+          // Let's assume data processing is done here.
+          setloading(false);
+      }, 1000); // simulate data loading for 1 second
       }
-  }, [headerData]);
+  };
+  
+
+
+ 
+
+  //   useEffect(() => {
+  //     if (headerData && Array.isArray(headerData)) {
+  //         const newFormData = headerData.reduce((acc, curr) => {
+  //           const existingValue = formData[curr.sFieldName];
+  //           const existingId = formData[curr.sFieldId]
+  //             if(curr.sType == "Autocomplete"){
+  //               if (existingValue !== undefined) {
+
+  //                 acc[curr.sFieldId] = existingId
+  //                 acc[curr.sFieldName] = existingValue
+  //                 } else { 
+  //                   acc[curr.sFieldId] = 0
+  //                   acc[curr.sFieldName] = ""
+  //                 }
+                
+                
+  //             }
+              
+  //             else if (curr.sFieldName) {
+  //               if (existingValue !== undefined) {
+  //                 // If there's an existing value, preserve it
+  //                 acc[curr.sFieldName] = existingValue;
+  //             } else {
+  //                 // Initialize field based on its data type
+  // if (curr.sDefaultValue !== undefined) {
+  //   // Handle default value based on the specified data type
+  //   switch (curr.sDatatype) {
+  //     case 'integer':
+  //       // Parse sDefaultValue to integer and store as number
+  //       acc[curr.sFieldName] = parseInt(curr.sDefaultValue, 10);
+  //       break;
+  //     case 'float':
+  //       // Store sDefaultValue as is to preserve formatting like "0.00"
+  //       acc[curr.sFieldName] = parseFloat(curr.sDefaultValue);
+  //       break;
+  //     case 'number':
+  //       // Try to parse as float first, then decide if integer format is needed
+  //       const parsedValue = parseFloat(curr.sDefaultValue);
+  //       acc[curr.sFieldName] = Number.isInteger(parsedValue) ? parsedValue : curr.sDefaultValue;
+  //       break;
+  //     case 'bool':
+         
+  //         acc[curr.sFieldName] = parseInt(curr.sDefaultValue, 10);
+  //         break;  
+  //     default:
+  //       // For non-numeric types, use the default value directly
+  //       acc[curr.sFieldName] = curr.sDefaultValue;
+  //   }
+  // } else {
+  //   // Fallback for when there's no default value specified, ensuring numeric types get 0
+  //   acc[curr.sFieldName] = (curr.sDatatype === 'number' || curr.sDatatype === 'integer' || curr.sDatatype === 'float') ? 0 : "";
+  // }
+  //             }
+  //             }
+              
+  //             return acc;
+  //         }, {});
+        
+  //         setformData(prevFormData => ({ ...prevFormData, ...newFormData }));
+  //     }
+  // }, [headerData]);
 
     const headerSelection = (value)=>{
         setselectedHeaderMain(value)
@@ -146,11 +264,11 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
      setheaderFormData(data)
    }, [formData])
    
- if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-    </div>;
-}
+//  if (loading) {
+//     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+//         <CircularProgress />
+//     </div>;
+// }
   return (
     <ThemeProvider theme={theme}>
     <div className="CLTCS2">
@@ -174,7 +292,8 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
      
 {tabNames.map((tabName, index) => {
   // Check if the first item exists and if its sFieldName is 'attachments'
-  const isAttachments = tabData[tabName] && tabData[tabName][0] && tabData[tabName][0].sFieldName === "attachments";
+  const isAttachments = tabData[tabName] && tabData[tabName][0] && tabData[tabName][0].sType
+  === "File";
   return (
         <div
           key={tabName}
@@ -184,7 +303,12 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
           aria-labelledby={`tab-${index}`}
           className={isAttachments  ? "fileInput-container" : "headInput-container"}
         >
-          {tabData[tabName] && activeTab === index && tabData[tabName].map((field) => (
+          {activeTab === index && loading ? (
+                            <div style={{ display: 'flex',position:"fixed", justifyContent: 'center', alignItems: 'center', height: '30vw',width:"85%" ,textAlign:"center"}}>
+                                <CircularProgress />
+                            </div>
+                        ) : (
+          tabData[tabName] && activeTab === index && tabData[tabName].map((field) => (
                 
                 <DynamicInputFieldHeader
 
@@ -229,7 +353,8 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
 
 
                 />
-                ))}
+              ))
+            )}
                 </div>
               )})}
       </div>

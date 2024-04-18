@@ -41,20 +41,22 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
            
            
            
-            return;
-          }else{
-            setcompanyList([])
-            setloading(false)
-            return
-    
-          }   
-
-            }
+          
+          }else {
+            // If resultData is empty but not an error, keep the old companyList
+            setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
+          }
+          }
+          else {
+            // If the response doesn't have a result field, it might be a network error
+            console.error("Failed to fetch data: Network error or no data");
+            // Optional: Set an error state and show a message to the user
+          }
             
             
           } catch (error) {
             console.log(error);
-            setcompanyList([])
+            
           }
         };
         fetchData();

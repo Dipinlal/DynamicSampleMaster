@@ -8,13 +8,29 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
 
     const [formData, setformData] = useState({})
     const [companyList, setcompanyList] = useState([]);
-    const [companyListExist, setCompanyListExist] = useState(formDataHeader[key1]??"");
+    const [companyListExist, setCompanyListExist] = useState("");
     const [changesTriggered, setchangesTriggered] = useState(false);
+
+    useEffect(() => {
+      // Convert [{id:1}, {id:2}, {id:3}] to "1,2,3"
+      console.log(formDataHeader[key1]);
+      if(formDataHeader[key1]!==""){
+        const idsString = formDataHeader[key1]?.map(item => item.id).join(',') ?? "";
+        setCompanyListExist(idsString);
+    
+      }
+      
+      // If companyListExist is meant to be an array of ids instead of a string, use:
+      // const idsArray = formDataHeader[key1]?.map(item => item.id) ?? [];
+      // setCompanyListExist(idsArray);
+  
+    }, []);
+
     const handleSelectedIds = useCallback(
         (selectedIds, params, selectedTitles) => {
-            setformData((prevFormData) => ({
+          setformData((prevFormData) => ({
             ...prevFormData,
-            [params]: selectedIds.join(),
+            [params]: selectedIds.map(id => ({ id: id })), // map to array of objects
           }));
         },
         []
@@ -23,7 +39,8 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
       useEffect(() => {
         setcheckBoxData(formData)
       }, [formData])
-      console.log(formDataHeader[key1],checkBoxData);
+     
+     
       const resetChangesTrigger = () => {
         setchangesTriggered(false);
       };
@@ -63,19 +80,22 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
              
              
              
-              return;
-            }else{
-              setcompanyList([])
-              setloading(false)
-              return
-      
+             
+            }else {
+              // If resultData is empty but not an error, keep the old companyList
+              setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
             }
+            }
+            else {
+              // If the response doesn't have a result field, it might be a network error
+              console.error("Failed to fetch data: Network error or no data");
+              // Optional: Set an error state and show a message to the user
             }
               
             
           } catch (error) {
             console.log(error);
-            setcompanyList([])
+           
           }
         };
         fetchData();
