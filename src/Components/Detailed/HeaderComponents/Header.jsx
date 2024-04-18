@@ -30,7 +30,7 @@ function Header({headerData,triggerValidation,resetTriggerVAlidation,errorGlobal
     const [loading, setloading] = useState(false)
     const [dataInitialized, setDataInitialized] = useState(false);
     
-  console.log(errorGlobal);
+
 
     // Asynchronous effect to fetch and process data
     useEffect(() => {

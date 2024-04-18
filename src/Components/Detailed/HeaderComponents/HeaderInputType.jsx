@@ -16,7 +16,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
 
     
     const [autoCompleteData, setAutoCompleteData] = useState({sName:"",iId:0})//forAucomplete only
-
+    const [files, setfiles] = useState([])
    
     const [checkBoxData, setcheckBoxData] = useState({})
     const [radioValue, setradioValue] = useState(0)
@@ -442,6 +442,23 @@ const handleChange = (e) => {
 
     }, [radioValue])
   
+    //handle files
+    useEffect(() => {
+     
+      if(type ==="File"){
+        if(files){
+         // handleValidationAutocomplete(radioValue[key1])
+        HeaderInputValue(key1,files)
+      }
+      else{
+        
+        HeaderInputValue(key1,[])
+        
+      }
+    }
+
+    }, [files])
+  
 
   // To validate on saving
   useEffect(()=>{
@@ -749,6 +766,7 @@ useEffect(() => {
           formDataHeader={formDataHeader}
           key1={key1}
           disabled={isDisabled}
+          setfiles={setfiles}
           />
         )
           

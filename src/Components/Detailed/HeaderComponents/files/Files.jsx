@@ -47,14 +47,14 @@ import AutoCompleteFiles from './AutoCompleteFiles';
     }
   }
 
-function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
+function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled,setfiles}) {
     const tableHeaderStyle ={
         border: '1px solid #ddd', padding: '2px', backgroundColor: secondaryColorTheme, color: 'white' ,fontSize:"12px"
      }
      const tableBodyStyle ={
        border: '1px solid #ddd', padding: '2px', 
      }
-  const [fileNames, setFileNames] = useState([]);
+  const [fileNames, setFileNames] = useState(formDataHeader[key1]);
   const [allFiles, setAllFiles] = useState([]);
   const [docType, setDocType] = useState('');
   const [iDocType, setiDocType] = useState(0)
@@ -64,8 +64,20 @@ function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled}) {
     sName:"",
     iId:0
   })
-  
 
+  const getAttachmentsData = () => {
+    return allFiles.map(fileObj => ({
+        iAttachType: fileObj.iDocType,
+        sRefNo: fileObj.sRefNumber,
+        sPath: fileObj.filename
+    }));
+};
+useEffect(() => {
+  setfiles(allFiles)
+}, [allFiles])
+
+  
+console.log(formDataHeader[key1]);
     const newFileRef = useRef();
 
   // Handler for file input change
