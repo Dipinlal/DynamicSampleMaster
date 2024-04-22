@@ -13,7 +13,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
 
     useEffect(() => {
       // Convert [{id:1}, {id:2}, {id:3}] to "1,2,3"
-      console.log(formDataHeader[key1]);
+      
       if(formDataHeader[key1]!==""){
         const idsString = formDataHeader[key1]?.map(item => item.id).join(',') ?? "";
         setCompanyListExist(idsString);
@@ -36,10 +36,7 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
         []
       );
      
-      useEffect(() => {
-        setcheckBoxData(formData)
-      }, [formData])
-     
+      
      
       const resetChangesTrigger = () => {
         setchangesTriggered(false);
@@ -60,46 +57,58 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
         [companyList, handleSelectedIds, changesTriggered, companyListExist]
       );
 
-      useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const iTag = iLinkTag;
-            const response = await getAutocomplete1(iTag)
-            if(response?.result){
-              const resultData = JSON.parse(response?.result)
-              if(resultData.length>0){
-              
-                
-                  const formattedData = resultData.map((item) => ({
-                    title: item.Name,
-                    iId: item.Id,
-                  }));
-                  setcompanyList(formattedData);
-                
-             
-             
-             
-             
-             
-            }else {
-              // If resultData is empty but not an error, keep the old companyList
-              setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
-            }
-            }
-            else {
-              // If the response doesn't have a result field, it might be a network error
-              console.error("Failed to fetch data: Network error or no data");
-              // Optional: Set an error state and show a message to the user
-            }
-              
+      const fetchData = async () => {
+        try {
+          const iTag = iLinkTag;
+          const response = await getAutocomplete1(iTag)
+          if(response?.result){
+            const resultData = JSON.parse(response?.result)
+            if(resultData.length>0){
             
-          } catch (error) {
-            console.log(error);
+              
+                const formattedData = resultData.map((item) => ({
+                  title: item.Name,
+                  iId: item.Id,
+                }));
+                setcompanyList(formattedData);
+              
            
+           
+           
+           
+           
+          }else {
+            // If resultData is empty but not an error, keep the old companyList
+            setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
           }
-        };
+          }
+          else {
+            // If the response doesn't have a result field, it might be a network error
+            console.error("Failed to fetch data: Network error or no data");
+            // Optional: Set an error state and show a message to the user
+          }
+            
+          
+        } catch (error) {
+          console.log(error);
+         
+        }
+      };
+      useEffect(() => {
+       
         fetchData();
       }, []);
+      useEffect(() => {
+        if(companyList.length>0)
+        {
+        setcheckBoxData(formData)
+        }
+        else{
+          fetchData()
+        }
+
+      }, [formData])
+     
   return (
     <div>
         {companyList.length > 0 && (

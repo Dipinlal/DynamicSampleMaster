@@ -67,7 +67,12 @@ api.interceptors.response.use(
   }
 );
 
-const makeAuthorizedRequest = async (method,url, params) => {
+const makeAuthorizedRequest = async (method,url, params) => {console.log(method,url, params);
+  
+  if(url=="/Employee/UploadFiles?masterId=0"){for (let [key, value] of params.entries()) {
+            console.log(key, value);
+          }
+  }
   try {
     let response 
     if(method === "get"){
@@ -117,10 +122,10 @@ export const Login_Login =async(payload)=>{
 }
 
 //getMasterFields
-export const getFields = async () => {
+export const getFields = async (master) => {
   // const response = await axios.get(`${BASE_URL}/MasterField/GetMastersFields`)
   // return response;
-  return makeAuthorizedRequest("get","/MasterField/GetMastersFields");
+  return makeAuthorizedRequest("get","/MasterField/GetMastersFields?master=Customer");
 };
 export const getAutocomplete = async (formDataiType,productSearchkey) => {
   return makeAuthorizedRequest("get",itag);
@@ -142,8 +147,8 @@ export const getAutocomplete1 = async (itag,params) => {
     // const response = await axios.get(`${BASE_URL}${itag}`,headers)
     // return response;
 };
-export const UploadFiles = async (master,formData) => {
-  return makeAuthorizedRequest("post",`/Employee/UploadFiles?master=${master}`,formData);
+export const UploadFiles = async ({masterId,formData}) => {
+  return makeAuthorizedRequest("post",`/Employee/UploadFiles?masterId=${masterId}`,formData);
 };
 
 
@@ -151,7 +156,7 @@ export const postEmployee = async (payload) => {
  
   const token = `${localStorage.getItem("accessToken")}`
   
-  const response = await axios.post(`${BASE_URL}/Employee/UpsertEmployee`,payload,{
+  const response = await axios.post(`${BASE_URL}/Employee/UpsertEmployeesDetails`,payload,{
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`

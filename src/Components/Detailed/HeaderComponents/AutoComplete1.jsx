@@ -86,8 +86,8 @@ const AutoComplete1 = ({
     const handleAutocompleteChange = (event, newValue) => {
         const updatedFormData = {
           ...formData,
-          sName: newValue ? newValue.Name : "",//"" was replaced by null
-          iId: newValue ? newValue.Id : 0,//"" was replaced by null
+          sName: newValue ? newValue.Name : null,//"" was replaced by null
+          iId: newValue ? newValue.Id : null,//"" was replaced by null
          
          
         };

@@ -15,7 +15,7 @@ import Header from "./HeaderComponents/Header";
 import Body from "./BodyComponents/Body";
 import AlertBox from "../AlertBox/AlertBox"
 import { Savings } from "@mui/icons-material";
-import { getFields } from "../../apis/Api";
+import { UploadFiles, getFields, postEmployee } from "../../apis/Api";
 
 function Detailed() {
 
@@ -30,7 +30,7 @@ function Detailed() {
   const [alertcolor, setalertcolor] = useState("#000000")
   const [fieldErrors, setFieldErrors] = useState({});
   const [headerFormData, setheaderFormData] = useState({
-    name:"Edit",cityId:9,cityName:"BERLIN",departmentDetails:[{id:1},{id:2}]
+    name:"Edit",cityId:9,cityName:"BERLIN"
 
     
   })
@@ -178,152 +178,168 @@ function Detailed() {
   //   });
   //   return updatedFormData;
   // };
+ 
   console.log("Saving data:", headerFormData);
-  // useEffect(() => {
-  //   const handleSave = async () => {
-  //     // Ensure there are no errors before proceeding with the save
-  //     const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
-  //     if (errorsArray.length === 0 && saving &&!saveValidation) {
-  //       try {
-  //         // Proceed with the saving logic here
-  //         // Your existing save logic
+    const handleSave = async () => {
+      console.log("Saving data:", headerFormData);
+
+      let selectedFiles= []
+
+      const attachmentsWithoutFiles = headerFormData.attachments.map((attachment) => {
+        if (attachment.file) {
+          // Add the file and its name to the selectedFiles array
+          selectedFiles.push({
+            file: attachment.file,
+            fileName: attachment.fileName
+          });
+        }
+        // Return the rest of the attachment data, including the fileName property
+        const { file, ...rest } = attachment;
+        return rest;
+      });
+      console.log(attachmentsWithoutFiles);
+      console.log(selectedFiles);
+      const newFormData = {...headerFormData, attachments:attachmentsWithoutFiles}
+      console.log(newFormData);
+      const formData = new FormData();
+    
+    if (selectedFiles && selectedFiles.length) {
+      selectedFiles.forEach((file, index) => {
+        formData.append(`files[${index}]`, file.file,file.fileName);
+      });
+    }
+        try {
           
-  //         const updatedHeaderFormData = validateAndUpdateFormData();
+          // for (let [key, value] of formData.entries()) {
+          //   console.log(key, value);
+          // }
           
-  //       // const response = await postEmployee(headerFormData)
           
-  //       //   if(response.status === 200){
-  //       //     setAlertMessage(response.data.message);
-  //       //     setShowAlert(true);
-  //       //     setalertcolor("#28a745")//green
+         const response = await postEmployee(newFormData)
+         console.log(response);
+         const response2 = await UploadFiles({masterId:0,formData});
+         console.log(response2);
+          
+        //   if(response.status === 200){
+        //     setAlertMessage(response.data.message);
+        //     setShowAlert(true);
+        //     setalertcolor("#28a745")//green
          
            
         
-  //       //     setTimeout(() => {
-  //       //       setShowAlert(false);
+        //     setTimeout(() => {
+        //       setShowAlert(false);
               
         
-  //       //     }, 1000);
-  //       //    }
-  //       //    else{
-  //       //     setAlertMessage(response.data.message);
-  //       //     setShowAlert(true);
-  //       //     setalertcolor("#ffcc00")//yellow
+        //     }, 1000);
+        //    }
+        //    else{
+        //     setAlertMessage(response.data.message);
+        //     setShowAlert(true);
+        //     setalertcolor("#ffcc00")//yellow
         
             
-  //       //     setTimeout(() => {
-  //       //       setShowAlert(false);
-  //       //       // navigate('/Home')
+        //     setTimeout(() => {
+        //       setShowAlert(false);
+        //       // navigate('/Home')
         
-  //       //     }, 1000);
-  //       //    }
-  //         // Handle successful save (e.g., show success message, navigate away, etc.)
-  //         setsaving(false); // Reset saving state
-  //       } catch (error) {
-  //         console.log(error);
-  //         setsaving(false);
+        //     }, 1000);
+        //    }
+          // Handle successful save (e.g., show success message, navigate away, etc.)
+          setsaving(false); // Reset saving state
+        } catch (error) {
+          console.log(error);
+          setsaving(false);
          
-  //         if (error.response && error.response.status) {
-  //           switch (error.response.status) {
-  //             case 400://bad request
+          if (error.response && error.response.status) {
+            switch (error.response.status) {
+              case 400://bad request
                
-  //             setAlertMessage(error.response.data.errors.employee[0]);
-  //             setShowAlert(true);
-  //             setalertcolor("#ffcc00")//yellow
+              setAlertMessage(error.response.data.errors.employee[0]);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
             
       
-  //             setTimeout(() => {
-  //               setShowAlert(false);
+              setTimeout(() => {
+                setShowAlert(false);
                 
       
-  //             }, 3000);
-  //               break;
-  //             case 401://unauthorized
+              }, 3000);
+                break;
+              case 401://unauthorized
                 
-  //               setAlertMessage(error.response.data.message);
-  //               setShowAlert(true);
-  //               setalertcolor("#ffcc00")//yellow
+                setAlertMessage(error.response.data.message);
+                setShowAlert(true);
+                setalertcolor("#ffcc00")//yellow
               
         
-  //               setTimeout(() => {
-  //                 setShowAlert(false);
+                setTimeout(() => {
+                  setShowAlert(false);
                   
         
-  //               }, 1000);
+                }, 1000);
                
-  //               break;
-  //             case 403://forbidden
-  //             setAlertMessage(error.response.data.message);
-  //             setShowAlert(true);
-  //             setalertcolor("#ffcc00")//yellow
+                break;
+              case 403://forbidden
+              setAlertMessage(error.response.data.message);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
             
       
-  //             setTimeout(() => {
-  //               setShowAlert(false);
+              setTimeout(() => {
+                setShowAlert(false);
                 
       
-  //             }, 1000);
+              }, 1000);
                
-  //               break;
-  //             case 404://Notfound
+                break;
+              case 404://Notfound
                 
-  //               setAlertMessage(error.response.data.message);
-  //             setShowAlert(true);
-  //             setalertcolor("#ffcc00")//yellow
+                setAlertMessage(error.response.data.message);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
             
       
-  //             setTimeout(() => {
-  //               setShowAlert(false);
+              setTimeout(() => {
+                setShowAlert(false);
               
       
-  //             }, 1000);
-  //               break;
-  //             case 409://conflict
-  //             setAlertMessage(error.response.data.message);
-  //             setShowAlert(true);
-  //             setalertcolor("#ffcc00")//yellow
+              }, 1000);
+                break;
+              case 409://conflict
+              setAlertMessage(error.response.data.message);
+              setShowAlert(true);
+              setalertcolor("#ffcc00")//yellow
             
       
-  //             setTimeout(() => {
-  //               setShowAlert(false);
+              setTimeout(() => {
+                setShowAlert(false);
                 
       
-  //             }, 1000);
+              }, 1000);
                
-  //               break;
-  //             case 500:
-  //               console.error("A 500 Internal Server Error occurred.");
-  //               // Handle server errors
-  //               break;
-  //             default:
-  //               console.error(`An error occurred: ${error.response.status}`);
-  //               // Handle other types of errors
-  //               break;
-  //           }
-  //         } else {
-  //           // If the error does not have a response status code, it might be a network error or something else
-  //           console.error("An error occurred:", error.message);
-  //           // Handle errors that aren't server responses, like network errors
-  //         }
-  //         // Handle save error (e.g., show error message)
-  //         setsaving(false); // Reset saving state
-  //       }
-  //     } else if (errorsArray.length > 0) {
-  //       const [firstErrorKey, firstErrorMessage] = errorsArray[0];
-  //       setAlertMessage(`${firstErrorKey}: ${firstErrorMessage}`);
-  //       setShowAlert(true);
-  //       setalertcolor("#ffcc00"); // yellow for errors
-  //       setTimeout(() => {
-  //       setShowAlert(false);
-                
-          
-  //       }, 1000);
-  //       setsaving(false); // Ensure we reset the saving flag if there are errors
-  //     }
-  //   };
+                break;
+              case 500:
+                console.error("A 500 Internal Server Error occurred.");
+                // Handle server errors
+                break;
+              default:
+                console.error(`An error occurred: ${error.response.status}`);
+                // Handle other types of errors
+                break;
+            }
+          } else {
+            // If the error does not have a response status code, it might be a network error or something else
+            console.error("An error occurred:", error.message);
+            // Handle errors that aren't server responses, like network errors
+          }
+          // Handle save error (e.g., show error message)
+          setsaving(false); // Reset saving state
+        }
+     
+    };
   
-  //   handleSave();
-  // }, [fieldErrors, saving,saveValidation]); // Depend on fieldErrors and saving
+
 
   // useEffect(()=>{
   
@@ -374,14 +390,20 @@ function Detailed() {
           for (const condition of conditions) {
             switch (condition.errorcondition) {
               case "Empty":
-                if (value === undefined ||value === false || value === null || value =="0" || value ==0 ||  (typeof value === 'string' && !value.trim())) {
+                if (
+                  value === undefined ||
+                  value === false ||
+                  value === null ||
+                  value == "0" ||
+                  value == 0 ||
+                  (typeof value === "string" && !value.trim())
+                ) {
                   errorMessage = condition.message;
                 }
                 break;
               case "maxlength":
                 if (value.length > field.iMaxSize) {
                   errorMessage = condition.message;
-                  
                 }
                 break;
               case "Before":
@@ -395,7 +417,12 @@ function Detailed() {
                   errorMessage = condition.message;
                 }
                 break;
-              // ... handle other conditions
+              case "File Required":
+                if (!(value.length > 0)) {
+                  errorMessage = condition.message;
+                }
+                break;
+
               default:
                 break;
             }
@@ -428,8 +455,7 @@ function Detailed() {
         setTimeout(() => {
         setShowAlert(false);
         },1000)
-      // If all fields are validated and there are no errors
-      // Perform the save operation
+        handleSave()
     } else {
          const errorsArray = Object.entries(fieldErrors).filter(([, message]) => message);
  

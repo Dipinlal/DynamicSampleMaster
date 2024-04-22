@@ -81,8 +81,8 @@ function initializeFormData(fields) {
           acc[field.sFieldId] = existingId
           acc[field.sFieldName] = existingValue
           } else { 
-            acc[field.sFieldId] = 0
-            acc[field.sFieldName] = ""
+            acc[field.sFieldId] = null
+            acc[field.sFieldName] = null
           }
         
         
@@ -123,8 +123,10 @@ let parsedValue;
         // If there's an error during parsing, return an empty array
         return [];
       }
+    // default:
+    //   return field.sDefaultValue !== null ? field.sDefaultValue : "";
     default:
-      return field.sDefaultValue !== null ? field.sDefaultValue : "";
+      return field.sDefaultValue ;
   }
 }
 

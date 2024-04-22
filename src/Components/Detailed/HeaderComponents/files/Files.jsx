@@ -47,37 +47,35 @@ import AutoCompleteFiles from './AutoCompleteFiles';
     }
   }
 
-function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled,setfiles}) {
+function Files({sFieldName,label,isMandatory,formDataHeader,key1,disabled,setfiles, fieldErrors,setFieldErrors,sErrorMsgConditions,handleError}) {
     const tableHeaderStyle ={
         border: '1px solid #ddd', padding: '2px', backgroundColor: secondaryColorTheme, color: 'white' ,fontSize:"12px"
      }
      const tableBodyStyle ={
        border: '1px solid #ddd', padding: '2px', 
      }
-  const [fileNames, setFileNames] = useState(formDataHeader[key1]);
-  const [allFiles, setAllFiles] = useState([]);
+ 
+  const [allFiles, setAllFiles] = useState(formDataHeader[key1]);
   const [docType, setDocType] = useState('');
-  const [iDocType, setiDocType] = useState(0)
+  const [attachType, setattachType] = useState(0)
   const [refNo, setRefNo] = useState('');
   const [editFileIndex, seteditFileIndex] = useState(null)
   const [autoCompleteData, setautoCompleteData] = useState({
     sName:"",
     iId:0
   })
+  const [error, setError] = useState('');
 
-  const getAttachmentsData = () => {
-    return allFiles.map(fileObj => ({
-        iAttachType: fileObj.iDocType,
-        sRefNo: fileObj.sRefNumber,
-        sPath: fileObj.filename
-    }));
-};
+ 
 useEffect(() => {
   setfiles(allFiles)
 }, [allFiles])
 
+useEffect(() => {
+  setError(fieldErrors[sFieldName] )
+ }, [fieldErrors[sFieldName]])
   
-console.log(formDataHeader[key1]);
+
     const newFileRef = useRef();
 
   // Handler for file input change
@@ -89,11 +87,63 @@ console.log(formDataHeader[key1]);
     }
     
   };
+
+  // Clear the error when the user selects a document type
+  useEffect(() => {
+    if (docType) {
+      setError('');
+    }
+  }, [docType]);
    // Handler for the Add button click
    const handleAddFile = async() => {
-    const fileInput = document.getElementById('chatboxfiles'); // Replace with your actual file input ID
+    const fileInput = document.getElementById('masterFilesId'); // Replace with your actual file input ID
     
     const fileToAdd = newFileRef.current;
+    let errorMessage = "";
+    if (sErrorMsgConditions) {
+      try {
+        const conditions = JSON.parse(sErrorMsgConditions);
+          
+        for (const condition of conditions) {
+          if (condition.errorcondition === "Type Required" && !docType) {
+            errorMessage = condition.message;
+            break; // Exit the loop if an error is found
+          }
+          if (condition.errorcondition === "File Required" && !fileToAdd) {
+            errorMessage = condition.message;
+            break; // Exit the loop if an error is found
+          }
+          if (condition.errorcondition === "Image Only" && fileToAdd) {
+            // Validate that fileToAdd is an image
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+            if (!validImageTypes.includes(fileToAdd.type)) {
+              errorMessage = condition.message;
+              break; // Exit the loop if an error is found
+            }
+          }
+          
+          
+        }
+          // If any error was found, break the loop
+          // if (errorMessage) break;
+        
+      } catch (e) {
+        console.error("Error parsing sErrorMsgConditions:", e);
+        // Handle error or set a default error message
+      }
+    }
+    
+    if(errorMessage != ""){
+      // handleError(errorMessage);
+      setError(errorMessage)
+      return
+    }
+    else{
+      setError("")
+    }
+    
+    
+    
     
     const formData1 = new FormData();
 
@@ -103,12 +153,13 @@ console.log(formDataHeader[key1]);
     
     if (fileToAdd) {
       const timestamp = new Date().toISOString().replace(/[^0-9]/g, ""); // Create a timestamp
-      
+      const todayDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
       const nameParts = fileToAdd.name.split('.'); // Split the file name to separate the extension
       const extension = nameParts.pop().toLowerCase(); // Remove the last part (extension)
       const baseName = nameParts.join('.'); // Rejoin the remaining parts in case the name contained periods
-      const modifiedName = `${docType}__userId_${timestamp}.${extension}`; // Construct the modified name
+      // const modifiedName = `${docType}__userId_${timestamp}.${extension}`; // Construct the modified name
 
+      const modifiedName = `userId_${timestamp}.${extension}`; 
     //   formData1.append("iType",11);
     // formData1.append("imageFiles", fileToAdd,modifiedName);
     // const response = await UploadFiles(master,formData1);
@@ -119,10 +170,10 @@ console.log(formDataHeader[key1]);
       setAllFiles(prevFiles => {
           const updatedFiles = [...prevFiles];
           updatedFiles[editFileIndex] = {
-              sDocType: docType,
-              iDocType:iDocType,
-              sRefNumber: refNo,
-              filename: modifiedName,
+              attachTypeName: docType,
+              attachType:attachType,
+              refNo: refNo,
+              fileName: modifiedName,
               file: fileToAdd,
           };
           return updatedFiles;
@@ -132,10 +183,10 @@ console.log(formDataHeader[key1]);
     setAllFiles(prevFiles => [
       ...prevFiles,
       {
-        sDocType: docType,
-        iDocType:iDocType, 
-        sRefNumber: refNo,
-        filename: modifiedName,
+        attachTypeName: docType,
+        attachType:attachType, 
+        refNo: refNo,
+        fileName: modifiedName,
         file: fileToAdd, // Include the File object
       }
     ]);
@@ -152,8 +203,6 @@ console.log(formDataHeader[key1]);
     seteditFileIndex(null);
     setautoCompleteData({sName:"",iId:0})
      
-    }else{
-     alert("select file")
     }
   } catch (error) {
       console.log(error);
@@ -162,7 +211,7 @@ console.log(formDataHeader[key1]);
   const handleDownload = (fileObj) => {
     if (fileObj.url) {
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-      const fileNameParts = fileObj.name.split('.');
+      const fileNameParts = fileObj.fileName.split('.');
       const extension = fileNameParts[fileNameParts.length - 1].toLowerCase();
   
       if (imageExtensions.includes(extension)) {
@@ -179,7 +228,7 @@ console.log(formDataHeader[key1]);
       // It's an existing file, download it from the URL
       const link = document.createElement('a');
       link.href = fileObj.url;
-      link.download = fileObj.name;
+      link.download = fileObj.fileName;
       link.target = '_blank';
       document.body.appendChild(link);
       link.click();
@@ -190,7 +239,7 @@ console.log(formDataHeader[key1]);
       const url = window.URL.createObjectURL(fileObj.file);
       const link = document.createElement('a');
       link.href = url;
-      link.download = fileObj.name;
+      link.download = fileObj.fileName;
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(url);
@@ -199,10 +248,10 @@ console.log(formDataHeader[key1]);
   };
   
   const handleEdit = (index, fileObj) => {
-   setDocType(fileObj?.sDocType??"")
-   setiDocType(fileObj?.iDocType??0)
-   setautoCompleteData({...autoCompleteData,sName:fileObj.sDocType,iId:fileObj.iDocType})
-   setRefNo(fileObj?.sRefNumber??"")
+   setDocType(fileObj?.attachTypeName??"")
+   setattachType(fileObj?.attachType??0)
+   setautoCompleteData({...autoCompleteData,sName:fileObj.attachTypeName,iId:fileObj.attachType})
+   setRefNo(fileObj?.refNo??"")
    const file = fileObj?.file;
     if (file) {
       newFileRef.current = file; // Store the file in the ref
@@ -210,7 +259,7 @@ console.log(formDataHeader[key1]);
 
     }
     const fileInput = document.querySelector('input[type="file"]');
-    const myFile = new File(['Hello World!'], fileObj.filename, {
+    const myFile = new File(['Hello World!'], fileObj.fileName, {
       type: 'text/plain',
       lastModified: new Date(),
   });
@@ -235,16 +284,16 @@ console.log(formDataHeader[key1]);
   const handleDeleteFile = (index) => {
     // Filter out the file at the specific index
     const newFiles = allFiles.filter((_, i) => i !== index);
-    const newFileNames = fileNames.filter((_, i) => i !== index);
+    
     setAllFiles(newFiles);
    
-    setFileNames(newFileNames);
+    
   };
 
   useEffect(() => {
   
     setDocType(autoCompleteData.sName)
-    setiDocType(autoCompleteData.iId)
+    setattachType(autoCompleteData.iId)
 
   }, [autoCompleteData])
   
@@ -252,44 +301,7 @@ console.log(formDataHeader[key1]);
     <div className='filesmain'>
         <div className='filesmainD1'>
             
-            {/* <TextField
-          label={label}
-          value={docType}
-          onChange={(e) => setDocType(e.target.value)}
-          //error={!!fieldErrors[key1]} // Use the error state for this field
-          //helperText={fieldErrors[key1]} // Display the error message
-          variant="outlined"
-          //fullWidth
-          //disabled={isDisabled}
-          InputProps={{
-            style: {
-              borderWidth: "1px",
-              borderColor: "transparent",
-              borderStyle: "solid",
-              borderRadius: "10px",
-              fontSize: "12px",
-              height: "35px",
-              paddingLeft: "0px",
-              textAlign: "center",
-              width:"100%"
-            },
-            inputProps: {
-              //maxLength: iMaxSize ? iMaxSize : 200,
-            },
-          }}
-          InputLabelProps={{
-            style: {
-              fontSize: "16px",
-              //color: isMandatory ? "red" : "inherit",
-            },
-            //shrink: sDatatype === "date" ? true : undefined, // Automatically shrink label for date type
-          }}
-          sx={textFieldStylye}
-        //   type={sDatatype}
-        //   value={formDataHeader[key1]}
-        //   onChange={handleChange}
-        //   onBlur={handleBlur}
-        /> */}
+            
         <AutoCompleteFiles
 
           formData={autoCompleteData}
@@ -353,7 +365,7 @@ console.log(formDataHeader[key1]);
                       type="file"
                       onChange={handleFileChange}
                       accept="/*"
-                      id="chatboxfiles"
+                      id="masterFilesId"
                     />
                     
                     <button
@@ -366,6 +378,7 @@ console.log(formDataHeader[key1]);
                     >
                       Add
                     </button>
+                    {error && <div style={{ color: 'red' }}>{error}</div>} {/* Display the error message here */}
                   </div>
         <div >
                     <table
@@ -395,13 +408,13 @@ console.log(formDataHeader[key1]);
                         </tr>
                       </thead>
                       <tbody>
-                        {allFiles.map((fileObj, index) => {
+                        {allFiles && allFiles.map((fileObj, index) => {
                            
                           return (
                             <tr key={index}>
                             <td style={tableBodyStyle}>{index + 1}</td>
-                            <td style={tableBodyStyle}>{fileObj.sDocType}</td>
-                            <td style={tableBodyStyle}>{fileObj.sRefNumber}</td>
+                            <td style={tableBodyStyle}>{fileObj.attachTypeName}</td>
+                            <td style={tableBodyStyle}>{fileObj.refNo}</td>
                             <td style={tableBodyStyle}>
                               <DownloadIcon
                                 sx={{
