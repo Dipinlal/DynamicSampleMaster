@@ -15,7 +15,7 @@ import Header from "./HeaderComponents/Header";
 import Body from "./BodyComponents/Body";
 import AlertBox from "../AlertBox/AlertBox";
 import { Savings } from "@mui/icons-material";
-import { UploadFiles, getFields, postEmployee } from "../../apis/Api";
+import { UploadFiles, getFields, postEmployee } from "../../apis/api";
 
 function Detailed() {
   const { iId } = useSelector((state) => state.authState);

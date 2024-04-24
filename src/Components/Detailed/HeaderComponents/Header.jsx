@@ -4,7 +4,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CircularProgress from "@mui/material/CircularProgress"; // For showing a loading spinner
-import { getAutocomplete1 } from "../../../apis/Api";
+import { getAutocomplete1 } from "../../../apis/api";
 
 function Header({
   headerData,

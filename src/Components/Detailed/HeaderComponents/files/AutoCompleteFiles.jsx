@@ -3,7 +3,7 @@ import { Autocomplete, TextField, Typography,ListSubheader, Paper } from "@mui/m
 // import { buttonColor1 } from '../../../config';
 // import { GetAutocompleate } from '../../../apiHelper';
 import { useSelector } from 'react-redux';
-import { getAutocomplete, getAutocomplete1 } from '../../../../Apis/Api';
+import { getAutocomplete, getAutocomplete1 } from '../../../../apis/api';
 
 
 

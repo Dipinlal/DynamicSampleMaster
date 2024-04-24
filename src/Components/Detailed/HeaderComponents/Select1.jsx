@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Select, MenuItem, InputLabel, FormControl, Typography, Paper } from "@mui/material";
 import { useSelector } from 'react-redux';
-import { getAutocomplete } from '../../../Apis/Api';
+import { getAutocomplete } from '../../../apis/api';
 
 const CustomSelect1 = ({
   formData,

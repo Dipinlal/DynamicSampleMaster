@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import "./checkbox.css"
 import SearchBox from './SearchBox';
-import { getAutocomplete1 } from '../../../../Apis/Api';
+import { getAutocomplete1 } from '../../../../apis/api';
 import { Typography } from '@mui/material';
 
 function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBoxData,formDataHeader,key1,disabled,menuList}) {
