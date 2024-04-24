@@ -1,17 +1,40 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import AutoComplete from './AutoComplete';
-import AutoComplete1 from './AutoComplete1';
-import { Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
-import CustomSelect1 from './Select1';
-import CheckBox from './CheckBox/CheckBox';
-import Radio from './radio/Radio';
-import Files from './files/Files';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import AutoComplete from "./AutoComplete";
+import AutoComplete1 from "./AutoComplete1";
+import {
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography,
+} from "@mui/material";
+import CustomSelect1 from "./Select1";
+import CheckBox from "./CheckBox/CheckBox";
+import Radio from "./radio/Radio";
+import Files from "./files/Files";
 
-
-
-
-const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,key1,sFieldId, type, HeaderInputValue, isMandatory, isDisabled,formDataHeader,label,iMaxSize,iLinkTag,isHeader,sDatatype,sDefaultValue,sErrorMsgConditions,
-  triggerValidation,resetTriggerVAlidation,onError,errorGlobal
+const DynamicInputFieldHeader = ({
+  bNegative,
+  bAllowSpecialChar,
+  bAllowDateBefore,
+  key1,
+  sFieldId,
+  type,
+  HeaderInputValue,
+  isMandatory,
+  isDisabled,
+  formDataHeader,
+  label,
+  iMaxSize,
+  iLinkTag,
+  isHeader,
+  sDatatype,
+  sDefaultValue,
+  sErrorMsgConditions,
+  triggerValidation,
+  resetTriggerVAlidation,
+  onError,
+  errorGlobal,
+  menuList,
 }) => {
   const [autoCompleteData, setAutoCompleteData] = useState(null); //forAucomplete only
   const [files, setfiles] = useState(null);
@@ -45,8 +68,6 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
   useEffect(() => {
     if (type === "File") setfiles(formDataHeader[key1]);
   }, []);
-
-
 
   // Setting error
   const handleError = (errorMessage) => {
@@ -162,6 +183,13 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     return { error, val }; // Returns true if no error, false otherwise
   };
 
+  const isValidEmail = (email) => {
+    // Simple regex for basic email validation
+    const emailRegex =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return emailRegex.test(email);
+  };
+
   //Main validation
   const handleValidation = (inputValue) => {
     let errorMessage = "";
@@ -214,6 +242,11 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
                 errorMessage = condition.message;
               }
               break;
+            case "Email Format":
+              if (!isValidEmail(inputValue)) {
+                errorMessage = condition.message;
+              }
+              break;
 
             default:
               break;
@@ -240,11 +273,9 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     return newInputvalue;
   };
 
-
   //Autocomple,checkbox,radio,checkboxes validation. fields other than input
   const handleValidationAutocomplete = (inputValue) => {
     let errorMessage = "";
-
 
     if (sErrorMsgConditions) {
       try {
@@ -275,7 +306,6 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
               }
               break;
 
-             
             default:
               break;
           }
@@ -332,6 +362,11 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
           validatedValue = value.replace(/[^a-zA-Z0-9 ]/g, ""); // Adjust based on what special characters are considered
         }
         break;
+      // case "email":
+
+      //     validatedValue = value.replace(/[^a-zA-Z0-9 ]/g, "");
+
+      //   break;
       default:
         validatedValue = value;
         break;
@@ -381,25 +416,48 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
   };
 
   // Additional checking and conversion after typping
-  const handleBlur = (e) => {
-    let val = e.target.value;
-    const newVal = handleValidation(val); // To validate after value has entered
+  // const handleBlur = (e) => {
+  //   let val = e.target.value;
+  //   const newVal = handleValidation(val); // To validate after value has entered
 
-    // to convert number in string to integer or float.onchange number comes in string, so converted here to required format
+  //   // to convert number in string to integer or float.onchange number comes in string, so converted here to required format
+  //   let numericalValue;
+  //   if (sDatatype === "integer") {
+  //     //for making integer
+  //     numericalValue = parseInt(formDataHeader[key1], 10);
+  //     if (isNaN(numericalValue)) numericalValue = null;
+  //     HeaderInputValue(key1, numericalValue);
+  //   } else if (sDatatype === "float") {
+  //     //for making float
+  //     numericalValue = parseFloat(formDataHeader[key1]);
+  //     if (isNaN(numericalValue)) numericalValue = null;
+  //     HeaderInputValue(key1, numericalValue);
+  //   } else {
+  //     HeaderInputValue(key1, newVal);
+  //   }
+  // };
+
+  const handleBlur = (e) => {
+    const rawValue = e.target.value;
+    const validatedValue = handleValidation(rawValue); // Validate and possibly correct the value
+
     let numericalValue;
-    if (sDatatype === "integer") {
-      //for making integer
-      numericalValue = parseInt(formDataHeader[key1], 10);
-      if (isNaN(numericalValue)) numericalValue = null; // Fallback to 0 if the conversion fails
-      HeaderInputValue(key1, numericalValue);
-    } else if (sDatatype === "float") {
-      //for making float
-      numericalValue = parseFloat(formDataHeader[key1]);
-      if (isNaN(numericalValue)) numericalValue = null; // Fallback to 0.0 if the conversion fails
-      HeaderInputValue(key1, numericalValue);
-    } else {
-      HeaderInputValue(key1, newVal);
+    switch (sDatatype) {
+      case "integer":
+        numericalValue = parseInt(validatedValue, 10); // Convert validated value to integer
+        if (isNaN(numericalValue)) numericalValue = null; // Handle NaN case
+        break;
+      case "number":
+      case "float":
+        numericalValue = parseFloat(validatedValue); // Convert validated value to float
+        if (isNaN(numericalValue)) numericalValue = null; // Handle NaN case
+        break;
+      default:
+        numericalValue = validatedValue; // Use validated value directly for other data types
+        break;
     }
+
+    HeaderInputValue(key1, numericalValue); // Update the state or props with the converted/validated value
   };
 
   //handle autocomplete
@@ -493,7 +551,8 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
     ) {
       handleValidationAutocomplete(autoCompleteData?.sName);
     } else if (
-      type === "CheckBoxes" && checkBoxData[key1] &&
+      type === "CheckBoxes" &&
+      checkBoxData[key1] &&
       (triggerValidation ||
         formDataHeader[key1]?.length !== checkBoxData[key1]?.length)
     ) {
@@ -504,8 +563,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
       (triggerValidation || formDataHeader[key1] != radioValue)
     ) {
       handleValidationAutocomplete(radioValue);
-    }
-    else if (
+    } else if (
       type === "File" &&
       files &&
       (triggerValidation || formDataHeader[key1] != files)
@@ -694,6 +752,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
           fieldErrors={fieldErrors}
           setFieldErrors={setFieldErrors}
           sErrorMsgConditions={sErrorMsgConditions}
+          menuList={menuList}
         />
       );
 
@@ -710,6 +769,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
             formDataHeader={formDataHeader}
             key1={key1}
             disabled={isDisabled}
+            menuList={menuList}
           />
           {fieldErrors[key1] && (
             <div style={{ color: "#D32F2F" }}>
@@ -733,6 +793,7 @@ const DynamicInputFieldHeader = ({bNegative,bAllowSpecialChar,bAllowDateBefore,k
             formDataHeader={formDataHeader}
             key1={key1}
             disabled={isDisabled}
+            menuList={menuList}
           />
           {fieldErrors[key1] && (
             <div style={{ color: "#D32F2F" }}>

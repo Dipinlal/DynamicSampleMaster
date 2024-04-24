@@ -2,7 +2,20 @@ import axios from "axios";
 import { BASE_URL } from "../config.js";
 import api from "../axios.js";
 
+let isRefreshing = false;
+let failedQueue = [];
 
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
 
 
 
@@ -25,7 +38,7 @@ const refreshToken = async () => {
 
     return accessToken;
   } catch (error) {
-    console.error("Failed to refresh token", error);
+    console.error("refresh token error", error);
 
     // Clear tokens from local storage in case of an error
     // localStorage.removeItem("accessToken");
@@ -45,60 +58,139 @@ api.interceptors.request.use((config) => {
 });
 
 // Interceptor for API responses
+// api.interceptors.response.use(
+//   (response) => {
+//     return response.data;
+//   },
+//   async (error) => {
+//     if (error.response && error.response.status === 401) {
+//       try {
+//         // Try to refresh the token
+//         const newAccessToken = await refreshToken();
+        
+//         // Retry the original request with the new access token
+//         error.config.headers.Authorization = `Bearer ${newAccessToken}`;
+//         return axios.request(error.config);
+//       } catch (refreshError) {
+//         console.error("Failed to refresh token from interceptor", refreshError);
+//         window.location.href = '/';
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );
+
 api.interceptors.response.use(
   (response) => {
     return response.data;
   },
   async (error) => {
+    const originalRequest = error.config;
+
     if (error.response && error.response.status === 401) {
-      try {
-        // Try to refresh the token
-        const newAccessToken = await refreshToken();
-        
-        // Retry the original request with the new access token
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axios.request(error.config);
-      } catch (refreshError) {
-        console.error("Failed to refresh token", refreshError);
-        window.location.href = '/';
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshToken().then(newToken => {
+          isRefreshing = false;
+          localStorage.setItem('accessToken', newToken);
+          processQueue(null, newToken);
+
+          originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
+          return api(originalRequest);
+        }).catch(refreshError => {
+          processQueue(refreshError, null);
+          console.error("Failed to refresh token from interceptor", refreshError);
+          window.location.href = '/';
+        });
       }
+
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      }).then(token => {
+        originalRequest.headers['Authorization'] = 'Bearer ' + token;
+        return api(originalRequest);
+      }).catch(err => {
+        return Promise.reject(err);
+      });
     }
+
     return Promise.reject(error);
   }
 );
 
-const makeAuthorizedRequest = async (method,url, params) => {console.log(method,url, params);
+// const makeAuthorizedRequest = async (method,url, params) => {
   
-  if(url=="/Employee/UploadFiles?masterId=0"){for (let [key, value] of params.entries()) {
-            console.log(key, value);
-          }
+//   const token = `${localStorage.getItem("accessToken")}`
+//   try {
+//     let response 
+//     if(method === "get"){
+//       response= await api.get(url, {
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": `Bearer ${token}`,
+//         },
+//         params,
+//       });
+//     }else{
+//       response= await api.post(url,params, {
+//         headers: {
+         
+//           "Authorization": `Bearer ${token}`
+//         },
+//       });
+//     }
+  
+//     return response;
+//   } catch (error) {
+//     console.error(`Error in ${url}`, error);
+//   }
+// };
+
+//Login page GetCompany
+
+const makeAuthorizedRequest = async (method, url, params) => {
+  const token = localStorage.getItem("accessToken");
+  const headers = {
+    "Authorization": `Bearer ${token}`
+  };
+
+  // When dealing with FormData, let Axios handle the Content-Type
+  if (params instanceof FormData) {
+    
+    headers['Content-Type'] = "multipart/form-data"; // This ensures Axios sets the correct type
+  } else {
+    headers['Content-Type'] = "application/json";
   }
+console.log(method, url, params);
   try {
-    let response 
+    let response;
     if(method === "get"){
-      response= await api.get(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        params,
-      });
-    }else{
-      response= await api.post(url,params, {
-        headers: {
-          // "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+            response= await api.get(url, {
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+              },
+              params,
+            });
     }
-  
+    else{        
+     response = await api({
+      method: method,
+      url: url,
+      data: params,
+      headers: headers
+    });
+   }
+
     return response;
   } catch (error) {
     console.error(`Error in ${url}`, error);
+    throw error;
   }
 };
 
-//Login page GetCompany
+
+
 export const Login_GetCompany =async()=>{
 try {
     const config = {
@@ -138,6 +230,7 @@ export const getAutocomplete = async (formDataiType,productSearchkey) => {
 };
 export const getAutocomplete1 = async (itag,params) => {
 
+  
  
     return makeAuthorizedRequest("get",itag,params);
     // const headers = {
@@ -147,23 +240,38 @@ export const getAutocomplete1 = async (itag,params) => {
     // const response = await axios.get(`${BASE_URL}${itag}`,headers)
     // return response;
 };
-export const UploadFiles = async ({masterId,formData}) => {
-  return makeAuthorizedRequest("post",`/Employee/UploadFiles?masterId=${masterId}`,formData);
-};
+// export const UploadFiles = async ({masterId,formData}) => {
+ 
 
+//  return makeAuthorizedRequest("post", `/Employee/UploadFiles?masterId=${masterId}`, formData);
+
+//   // const token = `${localStorage.getItem("accessToken")}`
+//   // const response = await axios.post(`${BASE_URL}/Employee/UploadFiles?masterId=${masterId}`, formData, {
+//   //   headers: {
+//   //     // "Content-Type": "multipart/form-data",
+//   //     "Authorization": `Bearer ${token}`,
+//   //   },
+//   // });
+//   // return response;
+// };
+
+export const UploadFiles = async ({ masterId, formData }) => {
+  // Ensure formData is correctly populated with file data
+  return makeAuthorizedRequest("post", `/Employee/UploadFiles?masterId=${masterId}`, formData);
+};
 
 export const postEmployee = async (payload) => {
  
-  const token = `${localStorage.getItem("accessToken")}`
+  // const token = `${localStorage.getItem("accessToken")}`
   
-  const response = await axios.post(`${BASE_URL}/Employee/UpsertEmployeesDetails`,payload,{
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    }
-  })
-    return response;
-  //return makeAuthorizedRequest("post","/Employee/UpsertEmployee",payload);
+  // const response = await axios.post(`${BASE_URL}/Employee/UpsertEmployeesDetails`,payload,{
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "Authorization": `Bearer ${token}`
+  //   }
+  // })
+  //   return response;
+  return makeAuthorizedRequest("post","/Employee/UpsertEmployeesDetails",payload);
 };
 
 export const getEmployeeSummary = async () => {

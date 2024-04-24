@@ -4,13 +4,13 @@ import SearchBox from './SearchBox';
 import { getAutocomplete1 } from '../../../../Apis/Api';
 import { Typography } from '@mui/material';
 
-function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBoxData,formDataHeader,key1,disabled}) {
+function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBoxData,formDataHeader,key1,disabled,menuList}) {
 
     const [formData, setformData] = useState({})
     const [companyList, setcompanyList] = useState([]);
     const [companyListExist, setCompanyListExist] = useState("");
     const [changesTriggered, setchangesTriggered] = useState(false);
-
+   
     useEffect(() => {
       // Convert [{id:1}, {id:2}, {id:3}] to "1,2,3"
       
@@ -57,55 +57,74 @@ function CheckBox({iLinkTag,sFieldName,label,isMandatory,checkBoxData,setcheckBo
         [companyList, handleSelectedIds, changesTriggered, companyListExist]
       );
 
-      const fetchData = async () => {
-        try {
-          const iTag = iLinkTag;
-          const response = await getAutocomplete1(iTag)
-          if(response?.result){
-            const resultData = JSON.parse(response?.result)
-            if(resultData.length>0){
+      useEffect(() => {
+
+        if(menuList.length>0){
             
               
-                const formattedData = resultData.map((item) => ({
-                  title: item.Name,
-                  iId: item.Id,
-                }));
-                setcompanyList(formattedData);
+          const formattedData = menuList.map((item) => ({
+            title: item.Name,
+            iId: item.Id,
+          }));
+          setcompanyList(formattedData);
+        
+     
+     
+     
+     
+    
+    }
+      },[menuList])
+
+      // const fetchData = async () => {
+      //   try {
+      //     const iTag = iLinkTag;
+      //     const response = await getAutocomplete1(iTag)
+      //     if(response?.result){
+      //       const resultData = JSON.parse(response?.result)
+      //       if(resultData.length>0){
+            
+              
+      //           const formattedData = resultData.map((item) => ({
+      //             title: item.Name,
+      //             iId: item.Id,
+      //           }));
+      //           setcompanyList(formattedData);
               
            
            
            
            
            
-          }else {
-            // If resultData is empty but not an error, keep the old companyList
-            setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
-          }
-          }
-          else {
-            // If the response doesn't have a result field, it might be a network error
-            console.error("Failed to fetch data: Network error or no data");
-            // Optional: Set an error state and show a message to the user
-          }
+      //     }else {
+      //       // If resultData is empty but not an error, keep the old companyList
+      //       setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
+      //     }
+      //     }
+      //     else {
+      //       // If the response doesn't have a result field, it might be a network error
+      //       console.error("Failed to fetch data: Network error or no data");
+      //       // Optional: Set an error state and show a message to the user
+      //     }
             
           
-        } catch (error) {
-          console.log(error);
+      //   } catch (error) {
+      //     console.log(error);
          
-        }
-      };
-      useEffect(() => {
+      //   }
+      // };
+      // useEffect(() => {
        
-        fetchData();
-      }, []);
+      //   fetchData();
+      // }, []);
       useEffect(() => {
         if(companyList.length>0)
         {
         setcheckBoxData(formData)
         }
-        else{
-          fetchData()
-        }
+        // else{
+        //   fetchData()
+        // }
 
       }, [formData])
      

@@ -4,7 +4,7 @@ import { IconButton, Typography } from '@mui/material';
 import "./radiocss.css"
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 
-function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,formDataHeader,key1,disabled}) {
+function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,formDataHeader,key1,disabled,menuList}) {
 
     
     const [companyList, setcompanyList] = useState([]);
@@ -20,47 +20,65 @@ function Radio({iLinkTag,sFieldName,label,isMandatory,radioValue,setradioValue,f
         setchangesTriggered(false);
       };
       
-
       useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const iTag = iLinkTag;
-            const response = await getAutocomplete1(iTag)
-            if(response?.result){
-              const resultData = JSON.parse(response?.result)
-            if(resultData.length>0){
+
+        if(menuList.length>0){
             
               
-                const formattedData = resultData.map((item) => ({
-                  title: item.Name,
-                  iId: item.Id,
-                }));
-                setcompanyList(formattedData);
+          const formattedData = menuList.map((item) => ({
+            title: item.Name,
+            iId: item.Id,
+          }));
+          setcompanyList(formattedData);
+        
+     
+     
+     
+     
+    
+    }
+      },[menuList])
+
+    //   useEffect(() => {
+    //     const fetchData = async () => {
+    //       try {
+    //         const iTag = iLinkTag;
+    //         const response = await getAutocomplete1(iTag)
+    //         if(response?.result){
+    //           const resultData = JSON.parse(response?.result)
+    //         if(resultData.length>0){
+            
+              
+    //             const formattedData = resultData.map((item) => ({
+    //               title: item.Name,
+    //               iId: item.Id,
+    //             }));
+    //             setcompanyList(formattedData);
               
            
            
            
            
           
-          }else {
-            // If resultData is empty but not an error, keep the old companyList
-            setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
-          }
-          }
-          else {
-            // If the response doesn't have a result field, it might be a network error
-            console.error("Failed to fetch data: Network error or no data");
-            // Optional: Set an error state and show a message to the user
-          }
+    //       }else {
+    //         // If resultData is empty but not an error, keep the old companyList
+    //         setcompanyList(prevCompanyList => prevCompanyList.length > 0 ? prevCompanyList : []);
+    //       }
+    //       }
+    //       else {
+    //         // If the response doesn't have a result field, it might be a network error
+    //         console.error("Failed to fetch data: Network error or no data");
+    //         // Optional: Set an error state and show a message to the user
+    //       }
             
             
-          } catch (error) {
-            console.log(error);
+    //       } catch (error) {
+    //         console.log(error);
             
-          }
-        };
-        fetchData();
-      }, []);
+    //       }
+    //     };
+    //     fetchData();
+    //   }, []);
       const handleRadioChange = (event) => {
         const selectedId = parseInt(event.target.value, 10);
        

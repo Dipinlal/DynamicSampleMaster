@@ -159,7 +159,7 @@ useEffect(() => {
       const baseName = nameParts.join('.'); // Rejoin the remaining parts in case the name contained periods
       // const modifiedName = `${docType}__userId_${timestamp}.${extension}`; // Construct the modified name
 
-      const modifiedName = `userId_${timestamp}.${extension}`; 
+      const modifiedName = `${attachType}_${timestamp}.${extension}`; 
     //   formData1.append("iType",11);
     // formData1.append("imageFiles", fileToAdd,modifiedName);
     // const response = await UploadFiles(master,formData1);
