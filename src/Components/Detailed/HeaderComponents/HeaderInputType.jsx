@@ -243,7 +243,7 @@ const DynamicInputFieldHeader = ({
               }
               break;
             case "Email Format":
-              if (!isValidEmail(inputValue)) {
+              if (inputValue && !isValidEmail(inputValue)) {
                 errorMessage = condition.message;
               }
               break;

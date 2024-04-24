@@ -369,7 +369,7 @@ function Detailed() {
                 }
                 break;
               case "Email Format":
-                if (!isValidEmail(inputValue)) {
+                if (value && !isValidEmail(value)) {
                   errorMessage = condition.message;
                 }
                 break;

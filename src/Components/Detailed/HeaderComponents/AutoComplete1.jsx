@@ -130,7 +130,7 @@ const AutoComplete1 = ({
   //get AutoMenu
   useEffect(() => {
     const fetchData = async () => {
-      console.log("fetch");
+      
       try {
         const config = {
           headers: {
@@ -140,7 +140,7 @@ const AutoComplete1 = ({
         const iType = iTypeF2;
         const iUser = iId;
         const iTag = iLinkTag;
-        console.log(autoSearchKey);
+       
         const response = await getAutocomplete1(iTag, {
           iType,
           search: autoSearchKey,
