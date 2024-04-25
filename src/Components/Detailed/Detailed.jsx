@@ -72,51 +72,100 @@ function Detailed() {
 
   //select main and attachements
 
-  //get document settings
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getFields();
+//   //get document settings
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const response = await getFields();
 
-        if (response?.result) {
-          setheaderData(JSON.parse(response.result));
+//         if (response?.result) {
+//           setheaderData(JSON.parse(response.result));
           
-        } else {
-          setheaderData([]);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+//         } else {
+//           setheaderData([]);
+//         }
+//       } catch (error) {
+//         console.log(error);
+//       }
+//     };
 
-    fetchData();
-  }, []);
-  //get details
-  useEffect(() => {
-    const fetchData = async () => {
-        if (!employeeId) return;  // Ensure employeeId is present
+//     fetchData();
+//   }, []);
+//   //get details
+//   useEffect(() => {
+//     const fetchData = async () => {
+//         if (!employeeId) return;  // Ensure employeeId is present
 
-        try {
+//         try {
            
 
-            // Assuming GetEmployeesDetails might return directly the data needed or an object with a 'result' property
-            const response = await GetEmployeesDetails({ masterId: masterId, employeeId: employeeId });
+//             // Assuming GetEmployeesDetails might return directly the data needed or an object with a 'result' property
+//             const response = await GetEmployeesDetails({ masterId: masterId, employeeId: employeeId });
 
-            if (response && response.result) {
-                const resultData = JSON.parse(response.result);
-                console.log("Fetched employee details:", resultData);
-                setheaderFormData(resultData);  // Set the state used by the Header component
-            } else {
-                console.error("No result data returned from GetEmployeesDetails");
-                setheaderFormData({});
-            }
-        } catch (error) {
-            console.error("Failed to fetch employee details:", error);
-        }
-    };
+//             if (response && response.result) {
+//                 const resultData = JSON.parse(response.result);
+//                 console.log("Fetched employee details:", resultData);
+//                 setheaderFormData(resultData);  // Set the state used by the Header component
+//             } else {
+//                 console.error("No result data returned from GetEmployeesDetails");
+//                 setheaderFormData({});
+//             }
+//         } catch (error) {
+//             console.error("Failed to fetch employee details:", error);
+//         }
+//     };
 
-    fetchData();
-}, [employeeId, masterId]);  // Dependency array includes any variables that on change, the effect should rerun
+//     fetchData();
+// }, []);  // Dependency array includes any variables that on change, the effect should rerun
+
+useEffect(() => {
+  const fetchHeaderData = async () => {
+      try {
+          const response = await getFields();
+          if (response?.result) {
+              return JSON.parse(response.result);
+          }
+          return [];
+      } catch (error) {
+          console.error('Error fetching header fields:', error);
+          return [];
+      }
+  };
+
+  const fetchEmployeeDetails = async () => {
+      if (!employeeId) return null; // Exit early if no employeeId is present
+      try {
+          const response = await GetEmployeesDetails({ masterId: masterId, employeeId: employeeId });
+          if (response && response.result) {
+              return JSON.parse(response.result);
+          }
+          return {};
+      } catch (error) {
+          console.error('Failed to fetch employee details:', error);
+          return {};
+      }
+  };
+
+  const fetchData = async () => {
+      try {
+          // Use Promise.all to wait for both fetches to finish
+          const [headerDataResult, headerFormDataResult] = await Promise.all([
+              fetchHeaderData(),
+              fetchEmployeeDetails(),
+          ]);
+
+          // Set the states with the results
+          setheaderData(headerDataResult);
+          if (headerFormDataResult) {
+              setheaderFormData(headerFormDataResult);
+          }
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      }
+  };
+
+  fetchData();
+}, [employeeId, masterId]); // Ensure this runs only once when the component mounts
 
 
 
