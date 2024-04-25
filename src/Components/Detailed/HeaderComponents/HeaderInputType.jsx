@@ -601,6 +601,8 @@ const DynamicInputFieldHeader = ({
             },
             inputProps: {
               maxLength: iMaxSize ? iMaxSize : 200,
+              autoComplete: `new-${sDatatype}`,
+              
             },
           }}
           InputLabelProps={{
@@ -651,6 +653,7 @@ const DynamicInputFieldHeader = ({
           value={formDataHeader[key1]}
           onChange={handleChange}
           onBlur={handleBlur}
+          autoComplete= "off"
         />
       );
 
@@ -678,6 +681,8 @@ const DynamicInputFieldHeader = ({
             },
             inputProps: {
               maxLength: iMaxSize ? iMaxSize + 1 : 200,
+              
+              
             },
           }}
           InputLabelProps={{
@@ -727,6 +732,7 @@ const DynamicInputFieldHeader = ({
           value={formDataHeader[key1]}
           onChange={handleChange}
           onBlur={handleBlur}
+         
         />
       );
 

@@ -14,6 +14,8 @@ function Header({
   handleFieldError,
   headerFormData,
   setheaderFormData,
+  resetForm,
+  setresetForm
 }) {
   const theme = createTheme({
     components: {
@@ -106,7 +108,7 @@ function Header({
       setloading(false);
     }
     loadData();
-  }, [headerData]);
+  }, [headerData,resetForm]);
 
   // Simulated async function to process header data
   const processHeaderData = async (headerData) => {
@@ -149,7 +151,9 @@ function Header({
     setheaderFormData(initialData);
     setDataInitialized(true);
     localStorage.setItem("headerFormData", JSON.stringify(initialData));
+    setresetForm(false)
   }
+ 
 
   function getDefaultValue(field) {
     let parsedValue;

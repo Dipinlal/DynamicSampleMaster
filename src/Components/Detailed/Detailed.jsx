@@ -42,8 +42,8 @@ function Detailed() {
       ...newFormData,
     }));
   };
-
   const [saving, setsaving] = useState(false);
+  const [resetForm, setresetForm] = useState(false)
 
   const buttonStyle = {
     textTransform: "none", // Set text transform to none for normal case
@@ -202,8 +202,11 @@ function Detailed() {
 
       const response = await postEmployee(newFormData);
       console.log(response);
+      
       const response2 = await UploadFiles({ masterId: 0, formData });
       console.log(response2);
+      setheaderFormData({})
+      setresetForm(true)
 
       //   if(response.status === 200){
       //     setAlertMessage(response.data.message);
@@ -536,6 +539,8 @@ function Detailed() {
           resetFieldErrors={resetFieldErrors}
           headerFormData={headerFormData}
           setheaderFormData={changeHeaderFormData}
+          resetForm={resetForm}
+          setresetForm={setresetForm}
         />
       </div>
     </>
