@@ -34,12 +34,8 @@ import { useState } from "react";
 export default function Summary() {
   const token = Number(localStorage.getItem("accessToken"));
   const location = useLocation();
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState(0);
+ 
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [data, setData] = React.useState([]);
   const [display, setDisplay] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -92,9 +88,9 @@ export default function Summary() {
     setIsModalOpen(false);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const  handleclose=()=>{
+    window.history.back();
+  }
   const handleOpen = () => {
     setOpen(true);
   };
@@ -107,7 +103,7 @@ export default function Summary() {
    
     if (response?.status === "Success") {
       const myObject = JSON.parse(response?.result);
-      console.log(myObject);
+     
   
       // Assuming Item1 contains the data for your table
       setData(myObject.Item1);
@@ -118,43 +114,40 @@ export default function Summary() {
   
       // Set total rows to your state or wherever it needs to be used
       settotalRows(totalRows);
-      console.log(totalRows); // This should log the number 68
+    
   }
 
-    handleClose();
+   
   };
-console.log(data);
+
   React.useEffect(() => {
     fetchData(); // Initial data fetch
-    setPage(0);
-  }, [token]);
+   
+  }, [pageNumber,displayLength]);
 
   const handleDisplayLengthChange = (newDisplayLength) => {
     setdisplayLength(newDisplayLength);
   };
 
   const handlepageNumberChange = (newpageNumber) => {
+    
     setpageNumber(newpageNumber);
   }
 
 
-  const handleEdit =()=>{
-    setEdit(selected.join())  
-    handleOpenModal()
-  }
+  
 
   const handleNew =()=>{
     // navigate("/MasterDetailed",{ state: { masterId: 0,employeeId:selectedDatas[0].iId } })
-    navigate("/MasterDetailed",{ state: { masterId: 0,employeeId:65 } })
+    navigate("/MasterDetailed",{ state: { masterId: 0,employeeId:0 } })
+  }
+  const handleEdit =()=>{
+    navigate("/MasterDetailed",{ state: { masterId: 0,employeeId:selectedDatas[0] } })
   }
 
- const handleSubmit = ()=>{
-   fetchData()
- }
 
-  const handlePage = ()=>{
-    setDirection(true)
-  }
+
+  
 
 
   return (
@@ -195,12 +188,20 @@ console.log(data);
 
               <Button 
               onClick={handleEdit}
-                 disabled={selected.length !== 1}
+                 disabled={selectedDatas.length !== 1}
                 variant="contained"
                 style={buttonStyle}
                 startIcon={<EditIcon />}
               >
                 Edit
+              </Button>
+              <Button 
+                variant="contained"
+                startIcon={<CloseIcon />}
+                style={buttonStyle}
+                onClick={handleclose}
+              >
+                close
               </Button>
               
             </Stack>
@@ -217,6 +218,7 @@ console.log(data);
              setchangesTriggered={resetChangesTrigger}
              onSelectedRowsChange={handleSelectedRowsChange}
              onRowDoubleClick={handleRowDoubleClick}
+             totalRows={totalRows}
              
              
            />

@@ -130,7 +130,7 @@ EnhancedTableHead.propTypes = {
 };
 
 export default function EnhancedTableRole(props) {
-  const { rows} = props;
+  const { rows,totalRows} = props;
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("");
   const [selected, setSelected] = React.useState([]);
@@ -213,11 +213,11 @@ export default function EnhancedTableRole(props) {
   // };
 
   const handleClick = (event, row) => {
-    const selectedIndex = selected.findIndex((item) => item.iId === row.iId);
+    const selectedIndex = selected.indexOf(row.iId);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, row); // Add the entire row object
+      newSelected = newSelected.concat(selected, row.iId); // Add the entire row object
     } else {
       newSelected = [
         ...selected.slice(0, selectedIndex),
@@ -241,7 +241,7 @@ export default function EnhancedTableRole(props) {
     props.onDisplayLengthChange(parseInt(event.target.value, 10));
   };
 
-  const isSelected = (id) => selected.some((item) => item.iId === id);
+  const isSelected = (id) => selected.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
 
@@ -372,7 +372,7 @@ export default function EnhancedTableRole(props) {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length > 0 ? rows[0].totalRows : 0}
+              rowCount={rows.length > 0 ? totalRows : 0}
               headCells={headCells}
               
             />
@@ -455,7 +455,7 @@ export default function EnhancedTableRole(props) {
         <TablePagination
           rowsPerPageOptions={[10, 25, 50, 100]}
           component="div"
-          count={rows.length > 0 ? rows[0].totalRows : 0}
+          count={rows.length > 0 ? totalRows : 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
