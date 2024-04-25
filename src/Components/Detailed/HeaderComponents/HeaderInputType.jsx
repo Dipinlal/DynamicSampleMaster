@@ -324,7 +324,7 @@ const DynamicInputFieldHeader = ({
   // Each value change
   const handleChange = (e) => {
     const { value } = e.target;
-    let validatedValue = value;
+    let validatedValue = value.trim() === "" ? null : value;
     switch (sDatatype) {
       case "integer":
         // For integers: Allow only digits, and if bNegative is true, allow a negative sign.
@@ -439,8 +439,8 @@ const DynamicInputFieldHeader = ({
 
   const handleBlur = (e) => {
     const rawValue = e.target.value;
-    const validatedValue = handleValidation(rawValue); // Validate and possibly correct the value
-
+    //const validatedValue = handleValidation(rawValue); // Validate and possibly correct the value
+    const validatedValue = rawValue.trim() === "" ? handleValidation(null) : handleValidation(rawValue);
     let numericalValue;
     switch (sDatatype) {
       case "integer":

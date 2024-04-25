@@ -5,8 +5,20 @@ import api from "../axios.js";
 let isRefreshing = false;
 let failedQueue = [];
 
+// const processQueue = (error, token = null) => {
+//   failedQueue.forEach(prom => {
+//     if (error) {
+//       prom.reject(error);
+//     } else {
+//       prom.resolve(token);
+//     }
+//   });
+
+//   failedQueue = [];
+// };
+
 const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
@@ -15,6 +27,19 @@ const processQueue = (error, token = null) => {
   });
 
   failedQueue = [];
+};
+const addRequestToQueue = (originalRequest) => {
+  return new Promise((resolve, reject) => {
+    failedQueue.push({
+      resolve: (token) => {
+        originalRequest.headers['Authorization'] = 'Bearer ' + token;
+        resolve(api(originalRequest));
+      },
+      reject: (err) => {
+        reject(err);
+      }
+    });
+  });
 };
 
 
@@ -80,43 +105,85 @@ api.interceptors.request.use((config) => {
 //   }
 // );
 
+// api.interceptors.response.use(
+//   (response) => {
+//     return response.data;
+//   },
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     if (error.response && error.response.status === 401) {
+//       if (!isRefreshing) {
+//         isRefreshing = true;
+//         refreshToken().then(newToken => {
+//           isRefreshing = false;
+//           localStorage.setItem('accessToken', newToken);
+//           processQueue(null, newToken);
+
+//           originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
+//           return api(originalRequest);
+//         }).catch(refreshError => {
+//           processQueue(refreshError, null);
+//           console.error("Failed to refresh token from interceptor", refreshError);
+//           window.location.href = '/';
+//         });
+//       }
+
+//       return new Promise((resolve, reject) => {
+//         failedQueue.push({ resolve, reject });
+//       }).then(token => {
+//         originalRequest.headers['Authorization'] = 'Bearer ' + token;
+//         return api(originalRequest);
+//       }).catch(err => {
+//         return Promise.reject(err);
+//       });
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
+
 api.interceptors.response.use(
   (response) => {
     return response.data;
   },
   async (error) => {
     const originalRequest = error.config;
-
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       if (!isRefreshing) {
         isRefreshing = true;
-        refreshToken().then(newToken => {
+        try {
+          const newToken = await refreshToken();
           isRefreshing = false;
-          localStorage.setItem('accessToken', newToken);
+          api.defaults.headers.common['Authorization'] = 'Bearer ' + newToken;
           processQueue(null, newToken);
-
+          originalRequest._retry = true;
           originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
           return api(originalRequest);
-        }).catch(refreshError => {
+        } catch (refreshError) {console.log(refreshError,"refreshError");
           processQueue(refreshError, null);
-          console.error("Failed to refresh token from interceptor", refreshError);
           window.location.href = '/';
-        });
+          return Promise.reject(refreshError);
+        }
       }
-
+      else {
+        return addRequestToQueue(originalRequest).catch(err => {
+          return Promise.reject(err);
+        });
+      } 
+      // If a refresh is already in progress, we'll return a promise that resolves with the new token
       return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      }).then(token => {
-        originalRequest.headers['Authorization'] = 'Bearer ' + token;
-        return api(originalRequest);
-      }).catch(err => {
-        return Promise.reject(err);
+        failedQueue.push((token) => {
+          originalRequest._retry = true;
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          resolve(api(originalRequest));
+        });
       });
     }
-
     return Promise.reject(error);
   }
 );
+
 
 // const makeAuthorizedRequest = async (method,url, params) => {
   
@@ -161,7 +228,7 @@ const makeAuthorizedRequest = async (method, url, params) => {
   } else {
     headers['Content-Type'] = "application/json";
   }
-console.log(method, url, params);
+
   try {
     let response;
     if(method === "get"){

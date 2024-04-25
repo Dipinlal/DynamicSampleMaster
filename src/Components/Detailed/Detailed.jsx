@@ -16,6 +16,10 @@ import Body from "./BodyComponents/Body";
 import AlertBox from "../AlertBox/AlertBox";
 import { Savings } from "@mui/icons-material";
 import { UploadFiles, getFields, postEmployee } from "../../apis/api";
+import { secondaryColorTheme } from "../../config";
+import { Stack } from "@mui/material";
+
+
 
 function Detailed() {
   const { iId } = useSelector((state) => state.authState);
@@ -40,6 +44,15 @@ function Detailed() {
   };
 
   const [saving, setsaving] = useState(false);
+
+  const buttonStyle = {
+    textTransform: "none", // Set text transform to none for normal case
+    color: `primary`, // Set text color
+    backgroundColor: secondaryColorTheme, // Set background color
+    boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.3)",
+    fontSize: "12px",
+    padding: "6px 10px",
+  };
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -394,6 +407,10 @@ function Detailed() {
     return allValid;
   };
 
+  const  handleclose=()=>{
+    window.history.back();
+  }
+
   const handleSaveClick = async () => {
     setsaveValidation(true); // Trigger the validation
     const allFieldsValidated = validateAllFields(headerData, headerFormData);
@@ -435,7 +452,12 @@ function Detailed() {
             <div>
               <h2 className="CLTCS1T1">{pageTitle}</h2>{" "}
             </div>
-            <div className="CLTCS1D2">
+            <Stack
+              direction="row"
+              spacing={1}
+              padding={1}
+              justifyContent="flex-end"
+            >
               {/* <Button
               id="CLTCS1D2B1"
               onClick={handleNew}
@@ -446,13 +468,23 @@ function Detailed() {
               New
             </Button> */}
               <Button
-                id="CLTCS1D2B2"
+                variant="contained"
+                style={buttonStyle}
                 disabled={saving}
                 onClick={handleSaveClick}
-                startIcon={<SaveIcon id="CLTCS1D2BI" className="CLTCS1D2B" />}
+                startIcon={<SaveIcon />}
               >
                 Save
               </Button>
+              <Button 
+                variant="contained"
+                startIcon={<CloseIcon />}
+                style={buttonStyle}
+                onClick={handleclose}
+              >
+                close
+              </Button>
+              </Stack>
 
               {/* <Button
               id="CLTCS1D2B2"
@@ -491,8 +523,9 @@ function Detailed() {
             >
               Close
             </Button> */}
-            </div>
+            
           </div>
+          
         </div>
         <Header
           headerData={headerData}

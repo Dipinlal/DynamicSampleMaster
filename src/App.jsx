@@ -11,6 +11,7 @@ import MetaData from './Components/MetaData';
 import Login from './Components/login/LogIn';
 import Home from './Components/Home/Home';
 import Detailed from './Components/Detailed/Detailed';
+import Summary from './Components/Home/Summary';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,7 +23,8 @@ function App() {
        <Routes>
           <Route path="/" element={<Login/>} />
           <Route path="/Home" element={<Home/>} />
-          <Route path="/Master" element={<Detailed/>} />
+          <Route path="/Master" element={<Summary/>} />
+          <Route path="/MasterDetailed" element={<Detailed/>} />
        </Routes>
        </HelmetProvider>
     </Router>

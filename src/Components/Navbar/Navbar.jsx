@@ -11,6 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useLocation, useNavigate } from 'react-router-dom'; 
 import { useDispatch, useSelector } from 'react-redux';
 import './navbar.css'
+import { secondaryColorTheme } from '../../config';
 
 
 function Navbar() {
@@ -79,7 +80,7 @@ const handleCloseSubMenu = () => {
   
     return (
       <>
-        <AppBar id='appBarMain' position="static">
+        <AppBar id='appBarMain' sx={{backgroundColor:secondaryColorTheme}} position="static">
           <Toolbar>
             <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
               <img src="/images/sang_logo.png" alt="Logo" style={{ marginRight: '10px', height: '40px' }} onClick={handleLogoClick}/>
