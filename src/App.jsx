@@ -11,7 +11,7 @@ import MetaData from './Components/MetaData';
 import Login from './Components/login/LogIn';
 import Home from './Components/Home/Home';
 import Detailed from './Components/Detailed/Detailed';
-import Summary from './Components/Home/Summary';
+import Summary from './Components/Summary/Summary'
 
 function App() {
   const [count, setCount] = useState(0)

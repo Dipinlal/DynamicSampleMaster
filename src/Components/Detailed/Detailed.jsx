@@ -15,7 +15,7 @@ import Header from "./HeaderComponents/Header";
 import Body from "./BodyComponents/Body";
 import AlertBox from "../AlertBox/AlertBox";
 import { Savings } from "@mui/icons-material";
-import { UploadFiles, getFields, postEmployee } from "../../apis/api";
+import { GetEmployeesDetails, UploadFiles, getFields, postEmployee } from "../../apis/api";
 import { secondaryColorTheme } from "../../config";
 import { Stack } from "@mui/material";
 
@@ -31,11 +31,7 @@ function Detailed() {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertcolor, setalertcolor] = useState("#000000");
   const [fieldErrors, setFieldErrors] = useState({});
-  const [headerFormData, setheaderFormData] = useState({
-    name: "Edit",
-    cityId: 9,
-    cityName: "BERLIN",
-  });
+  const [headerFormData, setheaderFormData] = useState({});
   const changeHeaderFormData = (newFormData) => {
     setheaderFormData((prevFormData) => ({
       ...prevFormData,
@@ -44,6 +40,9 @@ function Detailed() {
   };
   const [saving, setsaving] = useState(false);
   const [resetForm, setresetForm] = useState(false)
+
+
+
 
   const buttonStyle = {
     textTransform: "none", // Set text transform to none for normal case
@@ -58,8 +57,9 @@ function Detailed() {
   const location = useLocation();
 
   const pageTitle = location.state?.pageTitle;
-  const iTransId = location.state?.iTransid;
-  const iDocType = location.state?.iDoctype;
+  const masterId = location.state?.masterId;
+  const employeeId = location.state?.employeeId;
+  
 
   const handleFieldError = (fieldKey, errorMessage) => {
     setFieldErrors((prevErrors) => ({
@@ -80,7 +80,7 @@ function Detailed() {
 
         if (response?.result) {
           setheaderData(JSON.parse(response.result));
-          console.log(JSON.parse(response.result));
+          
         } else {
           setheaderData([]);
         }
@@ -94,26 +94,31 @@ function Detailed() {
   //get details
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const config = {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        };
+        if (!employeeId) return;  // Ensure employeeId is present
 
-        const iUser = iId;
+        try {
+           
 
-        // const response = await getDetails({iTransId,iUser,iDocType})
-        // // console.log(response)
-        // const resultData = JSON.parse(response.data.ResultData)
+            // Assuming GetEmployeesDetails might return directly the data needed or an object with a 'result' property
+            const response = await GetEmployeesDetails({ masterId: masterId, employeeId: employeeId });
 
-        // console.log(resultData)
-      } catch (error) {
-        console.log(error);
-      }
+            if (response && response.result) {
+                const resultData = JSON.parse(response.result);
+                console.log("Fetched employee details:", resultData);
+                setheaderFormData(resultData);  // Set the state used by the Header component
+            } else {
+                console.error("No result data returned from GetEmployeesDetails");
+                setheaderFormData({});
+            }
+        } catch (error) {
+            console.error("Failed to fetch employee details:", error);
+        }
     };
-    if (iTransId) fetchData();
-  }, [iTransId, iId, iDocType]);
+
+    fetchData();
+}, [employeeId, masterId]);  // Dependency array includes any variables that on change, the effect should rerun
+
+
 
   const resetSavevalidation = () => {
     setsaveValidation(false);
@@ -163,7 +168,7 @@ function Detailed() {
 
   console.log("Saving data:", headerFormData);
   const handleSave = async () => {
-    console.log("Saving data:", headerFormData);
+    
 
     let selectedFiles = [];
 
