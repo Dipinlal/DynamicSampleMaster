@@ -13,7 +13,7 @@ const CustomSelect1 = ({
   iMaxSize,
   iLinkTag,
   sFieldName
-}) => {console.log(formData[sFieldName]);
+}) => {
   const { iId } = useSelector((state) => state.authState);
   const [selectedValue, setSelectedValue] = useState('');
   const [options, setOptions] = useState([]);

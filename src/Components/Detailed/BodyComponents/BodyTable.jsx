@@ -96,7 +96,7 @@ const MuiEditableTable = ({bodyData}) => {
     })
 
 }
-console.log(rows)
+
 const handleCellChange = (value, rowIndex, columnId) => {
   // Create a new array with the updated row
   const newRows = rows.map((row, index) => {

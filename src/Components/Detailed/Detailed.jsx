@@ -158,13 +158,13 @@ useEffect(() => {
           // Set the states with the results
           setheaderData(headerDataResult);
           if (headerFormDataResult) {
-            const { employee, ...otherDetails } = headerFormDataResult;
-      const mainDetails = employee[0]; // Assuming employee[0] exists and is the object you want
+            const { mainDetails, ...otherDetails } = headerFormDataResult;
+      const mainDetails1 = mainDetails[0]; // Assuming employee[0] exists and is the object you want
 
       // Combine otherDetails and mainDetails
       const combinedDetails = {
         ...otherDetails, // Spread other details
-        ...mainDetails,  // Spread main details, this will override any matching keys from otherDetails with those from mainDetails
+        ...mainDetails1,  // Spread main details, this will override any matching keys from otherDetails with those from mainDetails
       };
 
       // Log the combined object to the console
@@ -229,7 +229,7 @@ useEffect(() => {
   //   return updatedFormData;
   // };
 
-  console.log("Saving data:", headerFormData);
+  
   const handleSave = async () => {
     
 
@@ -249,13 +249,12 @@ useEffect(() => {
         return rest;
       }
     );
-    console.log(attachmentsWithoutFiles);
-    console.log(selectedFiles);
+    
     const newFormData = {
       ...headerFormData,
       attachments: attachmentsWithoutFiles,
     };
-    console.log(newFormData);
+   
     const formData = new FormData();
 
     if (selectedFiles && selectedFiles.length) {
@@ -282,7 +281,10 @@ useEffect(() => {
         }
         setheaderFormData({})
         setresetForm(true)
-      const response2 = await UploadFiles({ masterId: 0, formData });
+        if (selectedFiles && selectedFiles.length>0) {
+          const response2 = await UploadFiles({ masterId: 0, formData });
+        }
+      
       
       
 

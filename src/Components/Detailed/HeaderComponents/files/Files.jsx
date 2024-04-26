@@ -99,6 +99,8 @@ useEffect(() => {
     const fileInput = document.getElementById('masterFilesId'); // Replace with your actual file input ID
     
     const fileToAdd = newFileRef.current;
+    const existingFile = allFiles[editFileIndex]?.baseUrl;
+    
     let errorMessage = "";
     if (sErrorMsgConditions) {
       try {
@@ -109,7 +111,7 @@ useEffect(() => {
             errorMessage = condition.message;
             break; // Exit the loop if an error is found
           }
-          if (condition.errorcondition === "File Required" && !fileToAdd) {
+          if (condition.errorcondition === "File Required" && (!fileToAdd && !existingFile)) {
             errorMessage = condition.message;
             break; // Exit the loop if an error is found
           }
@@ -150,13 +152,13 @@ useEffect(() => {
     try {
       
    
-    
-    if (fileToAdd) {
+      
+    if (fileToAdd ||existingFile ) {
       const timestamp = new Date().toISOString().replace(/[^0-9]/g, ""); // Create a timestamp
       const todayDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
-      const nameParts = fileToAdd.name.split('.'); // Split the file name to separate the extension
-      const extension = nameParts.pop().toLowerCase(); // Remove the last part (extension)
-      const baseName = nameParts.join('.'); // Rejoin the remaining parts in case the name contained periods
+      const nameParts = fileToAdd?.name?.split('.'); // Split the file name to separate the extension
+      const extension = nameParts?.pop().toLowerCase(); // Remove the last part (extension)
+      const baseName = nameParts?.join('.'); // Rejoin the remaining parts in case the name contained periods
       // const modifiedName = `${docType}__userId_${timestamp}.${extension}`; // Construct the modified name
 
       const modifiedName = `${attachType}_${timestamp}.${extension}`; 
@@ -169,13 +171,26 @@ useEffect(() => {
       // Editing an existing file
       setAllFiles(prevFiles => {
           const updatedFiles = [...prevFiles];
-          updatedFiles[editFileIndex] = {
+          const existingFile = updatedFiles[editFileIndex];
+          if (fileToAdd) 
+          {
+            updatedFiles[editFileIndex] = {
+                attachTypeName: docType,
+                attachType:attachType,
+                refNo: refNo,
+                fileName: modifiedName,
+                file: fileToAdd,
+            };
+           }
+          else {
+            updatedFiles[editFileIndex] = {
+              ...existingFile, // keep the existing fields
               attachTypeName: docType,
-              attachType:attachType,
+              attachType: attachType,
               refNo: refNo,
-              fileName: modifiedName,
-              file: fileToAdd,
-          };
+              // Don't update the file object
+            };
+          }
           return updatedFiles;
       });
     }
@@ -209,7 +224,7 @@ useEffect(() => {
   }
   };
   const handleDownload = (fileObj) => {
-    if (fileObj.url) {
+    if (fileObj.baseUrl) {
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
       const fileNameParts = fileObj.fileName.split('.');
       const extension = fileNameParts[fileNameParts.length - 1].toLowerCase();
@@ -218,7 +233,7 @@ useEffect(() => {
         // Handle images: display in a new tab
         const htmlContent = `<html>
                                <head><title>Image Viewer</title></head>
-                               <body><img src="${fileObj.url}" style="max-width: 100%; height: auto;"></body>
+                               <body><img src="${fileObj.baseUrl}/${fileObj.fileName}" style="max-width: 100%; height: auto;"></body>
                              </html>`;
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
