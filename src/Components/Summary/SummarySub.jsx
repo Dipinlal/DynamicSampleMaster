@@ -22,7 +22,7 @@ import { visuallyHidden } from "@mui/utils";
 import { Button, TextField } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getEmployeeSummary } from "../../Apis/Api";
+import { getEmployeeSummary } from "../../apis/api";
 import { secondaryColorTheme } from "../../config";
 import EnhancedTableRole from "./SummaryTable";
 import { useState } from "react";
@@ -104,13 +104,13 @@ export default function Summary() {
     if (response?.status === "Success") {
       const myObject = JSON.parse(response?.result);
      
-  
+      
       // Assuming Item1 contains the data for your table
-      setData(myObject.Item1);
+      setData(myObject?.Data);
   
       // Extract the number of total rows from Item2
-      const totalRowsString = myObject.Item2; // This should be "Total Rows: 68"
-      const totalRows = parseInt(totalRowsString.split(":")[1].trim(), 10); // This converts the "68" into a number
+      const totalRows = myObject?.TotalRows[0].TotalRows;
+      
   
       // Set total rows to your state or wherever it needs to be used
       settotalRows(totalRows);

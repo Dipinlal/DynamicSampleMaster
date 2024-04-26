@@ -232,13 +232,7 @@ const makeAuthorizedRequest = async (method, url, params) => {
   try {
     let response;
     if(method === "get"){
-            response= await api.get(url, {
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-              },
-              params,
-            });
+            response= await api.get(url,{ headers, params });
     }
     else{        
      response = await api({
@@ -341,7 +335,10 @@ export const postEmployee = async (payload) => {
   return makeAuthorizedRequest("post","/Employee/UpsertEmployeesDetails",payload);
 };
 
-export const getEmployeeSummary = async () => {
-  return makeAuthorizedRequest("get","/Employee/GetEmployees");
+export const getEmployeeSummary = async (payload) => {
+  return makeAuthorizedRequest("get","/Employee/GetEmployeesSummary",payload);
 };
 
+export const GetEmployeesDetails = async (payload) => {
+  return makeAuthorizedRequest("get","/Employee/GetEmployeesDetails",payload);
+};
