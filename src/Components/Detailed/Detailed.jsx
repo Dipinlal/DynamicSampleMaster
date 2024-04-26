@@ -181,7 +181,7 @@ useEffect(() => {
   fetchData();
 }, [employeeId, masterId]); // Ensure this runs only once when the component mounts
 
-
+console.log(headerFormData);
 
   const resetSavevalidation = () => {
     setsaveValidation(false);

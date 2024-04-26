@@ -324,6 +324,12 @@ const DynamicInputFieldHeader = ({
   // Each value change
   const handleChange = (e) => {
     const { value } = e.target;
+      // Check if the value exceeds the maxLength
+      if (iMaxSize && value.length > iMaxSize) {
+        // If it does, prevent further input
+        e.preventDefault();
+        return;
+    }
     let validatedValue = value.trim() === "" ? null : value;
     switch (sDatatype) {
       case "integer":
@@ -602,6 +608,11 @@ const DynamicInputFieldHeader = ({
             inputProps: {
               maxLength: iMaxSize ? iMaxSize : 200,
               autoComplete: `new-${sDatatype}`,
+              ...(sDatatype === "date" ? {
+                onKeyDown: (e) => e.preventDefault(),
+                onClick: (e) => e.target.showPicker?.(),
+                onFocus: (e) => e.target.showPicker?.()
+              } : {})
               
             },
           }}

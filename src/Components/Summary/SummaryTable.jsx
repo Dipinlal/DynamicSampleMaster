@@ -141,7 +141,7 @@ export default function EnhancedTableRole(props) {
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [doubleclickedState, setdoubleclickedState] = React.useState([]);
 
-  const excludedFields = [];
+  const excludedFields = ["iId"];
 
   const transformData = (rows) => {
     return rows.map((row) => {
