@@ -47,6 +47,7 @@ export default function Summary() {
   const [changesTriggered, setchangesTriggered] = React.useState(false);
   const [selectedDatas, setselectedDatas] = React.useState([]);
   const [totalRows, settotalRows] = useState(0)
+  const [refreshFlag, setrefreshFlag] = useState(true)
 
   const navigate = useNavigate()
   const buttonStyle = {
@@ -99,8 +100,8 @@ export default function Summary() {
     handleOpen();
     setSelected([]);
 
-    const response = await getEmployeeSummary({refreshFlag:false,pageNumber:pageNumber,pageSize:displayLength,masterId:0});
-   
+    const response = await getEmployeeSummary({refreshFlag:refreshFlag,pageNumber:pageNumber,pageSize:displayLength,masterId:0});
+    setrefreshFlag(false)
     if (response?.status === "Success") {
       const myObject = JSON.parse(response?.result);
      

@@ -40,6 +40,7 @@ function Detailed() {
   };
   const [saving, setsaving] = useState(false);
   const [resetForm, setresetForm] = useState(false)
+  
 
 
 
@@ -157,7 +158,20 @@ useEffect(() => {
           // Set the states with the results
           setheaderData(headerDataResult);
           if (headerFormDataResult) {
-              setheaderFormData(headerFormDataResult);
+            const { employee, ...otherDetails } = headerFormDataResult;
+      const mainDetails = employee[0]; // Assuming employee[0] exists and is the object you want
+
+      // Combine otherDetails and mainDetails
+      const combinedDetails = {
+        ...otherDetails, // Spread other details
+        ...mainDetails,  // Spread main details, this will override any matching keys from otherDetails with those from mainDetails
+      };
+
+      // Log the combined object to the console
+      
+
+      // Store the combined object in headerFormData
+      setheaderFormData(combinedDetails);
           }
       } catch (error) {
           console.error('Error fetching data:', error);
@@ -255,12 +269,22 @@ useEffect(() => {
       // }
 
       const response = await postEmployee(newFormData);
-      console.log(response);
       
+          if(response.statusCode == 201){
+          setAlertMessage(response.message);
+          setShowAlert(true);
+          setalertcolor("#28a745")//green
+
+          setTimeout(() => {
+            setShowAlert(false);
+
+          }, 1000);
+        }
+        setheaderFormData({})
+        setresetForm(true)
       const response2 = await UploadFiles({ masterId: 0, formData });
-      console.log(response2);
-      setheaderFormData({})
-      setresetForm(true)
+      
+      
 
       //   if(response.status === 200){
       //     setAlertMessage(response.data.message);
@@ -473,12 +497,12 @@ useEffect(() => {
     const allFieldsValidated = validateAllFields(headerData, headerFormData);
 
     if (allFieldsValidated) {
-      setAlertMessage(`No error`);
-      setShowAlert(true);
-      setalertcolor("#ffcc00"); // yellow for errors
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 1000);
+      // setAlertMessage(`No error`);
+      // setShowAlert(true);
+      // setalertcolor("#ffcc00"); // yellow for errors
+      // setTimeout(() => {
+      //   setShowAlert(false);
+      // }, 1000);
       handleSave();
     } else {
       const errorsArray = Object.entries(fieldErrors).filter(
