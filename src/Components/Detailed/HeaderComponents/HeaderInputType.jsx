@@ -370,7 +370,7 @@ const DynamicInputFieldHeader = ({
         const trimmedValue = rawValue.trim();
 
         // Apply validation logic:
-        const validatedValue = trimmedValue === "" ? null : handleValidation(trimmedValue);    
+        const validatedValue = trimmedValue === "" ? null : trimmedValue;    
         let numericalValue;
 
     switch (sDatatype) {
