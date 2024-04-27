@@ -160,7 +160,7 @@ api.interceptors.response.use(
           originalRequest._retry = true;
           originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
           return api(originalRequest);
-        } catch (refreshError) {console.log(refreshError,"refreshError");
+        } catch (refreshError) {
           processQueue(refreshError, null);
           window.location.href = '/';
           return Promise.reject(refreshError);

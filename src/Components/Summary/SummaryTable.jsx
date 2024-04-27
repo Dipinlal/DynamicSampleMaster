@@ -347,13 +347,14 @@ export default function EnhancedTableRole(props) {
           </Select>
         </FormControl>
 
-        {/* <input
+        <input
           placeholder="Search"
           value={searchTerm}
           id="FXsearchField"
           onChange={handleSearch}
           variant="outlined"
-        /> */}
+          style={{height:"20px",border:"1px solid #ddd"}}
+        />
       </div>
       {filteredRows && filteredRows.length > 0 ? (
       <Paper sx={{ width: "100%", mb: 2 }}>
