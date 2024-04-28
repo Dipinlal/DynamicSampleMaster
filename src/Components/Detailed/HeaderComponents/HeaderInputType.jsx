@@ -330,8 +330,7 @@ const DynamicInputFieldHeader = ({
     handleError(errorMessage);
   };
 
-  const handleNumericChange = (value) => {
- 
+  const handleNumericChange = (value, locale = 'en-US') => {console.log(value);
     if (value === '') {
       setDisplayValue(''); // Clear the display value
       HeaderInputValue(key1, null); // Update the value to null or empty string
@@ -340,58 +339,65 @@ const DynamicInputFieldHeader = ({
     if (typeof value !== 'string' || !value) {
       return;
     }
+    
     // Initial removal of disallowed characters based on type and negativity allowance
     let rawValue = value.replace(/[^0-9.-]/g, ''); // Remove everything except digits, minus, and dot
 
     if (!bNegative) {
-        rawValue = rawValue.replace(/-/g, ''); // Remove negative sign if negatives are not allowed
+      rawValue = rawValue.replace(/-/g, ''); // Remove negative sign if negatives are not allowed
     }
-
-    // For handling multiple dots or incorrect minus placements
+  
+    // Correct handling of negative sign and manage only one decimal point for float/number
     if (sDatatype === 'float' || sDatatype === 'number') {
-        // Allow only one decimal point
-        const parts = rawValue.split('.');
-        if (parts.length > 2) { // More than one decimal point
-            rawValue = parts[0] + '.' + parts.slice(1).join('');
-           
-        }
+      const parts = rawValue.split('.');
+      rawValue = parts[0] + (parts.length > 1 ? '.' + parts.slice(1).join('') : '');
     } else if (sDatatype === 'integer') {
-        rawValue = rawValue.replace(/\./g, ''); // Remove decimal points for integers
+      rawValue = rawValue.replace(/\./g, ''); // Remove decimal points for integers
     }
     
-    // Correct handling of negative sign
-    rawValue = rawValue.replace(/^-|-(?!$)/g, '$1'); // Allow minus only at the start
-   
-    // Format number with thousand separators for display
-    const formattedValue = rawValue
-        .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-        .replace(/,-/g, '-'); // Ensures negative sign is at the front if any
-        
-        const trimmedValue = rawValue.trim();
-
-        // Apply validation logic:
-        const validatedValue = trimmedValue === "" ? null : trimmedValue;    
-        let numericalValue;
-
-    switch (sDatatype) {
-        case "integer":
-            numericalValue = parseInt(validatedValue, 10);
-            if (isNaN(numericalValue)) numericalValue = null;
-            break;
-        case "number":
-        case "float":
-            numericalValue = parseFloat(validatedValue);
-            if (isNaN(numericalValue)) numericalValue = null;
-            break;
-        default:
-            numericalValue = validatedValue;
-            break;
-    }
+  
+  
+    // Apply trimming and validation logic
+    const trimmedValue = rawValue.trim();
+    const validatedValue = trimmedValue === "" ? null : trimmedValue;    
+    let numericalValue;
+  
+    if (validatedValue !== null && validatedValue !== '-' && validatedValue.match(/^-?\d*\.?\d*$/)) {
+      switch (sDatatype) {
+      case "integer":
+          numericalValue = parseInt(validatedValue, 10);
+          break;
+      case "number":
+      case "float":
+          numericalValue = parseFloat(validatedValue);
+          break;
+      default:
+          numericalValue = validatedValue;
+          break;
+      }
+      if (isNaN(numericalValue)) {
+          numericalValue = null;
+      }
+  } else {
+      numericalValue = validatedValue === '-' ? '-' : null;
+  }
+  console.log(numericalValue,"after pasrse null");
+  let formattedValue;
+  if (numericalValue === '-' || rawValue.endsWith('.')) {
+      formattedValue = rawValue;
+  } else {
+    formattedValue = numericalValue !== null ? new Intl.NumberFormat(locale, {
+        style: 'decimal',
+        maximumFractionDigits: sDatatype === 'integer' ? 0 : 8
+    }).format(numericalValue) : '';
+   }
+  
     const newVal = handleValidation(numericalValue);
-   console.log(formattedValue,newVal);
+    console.log(formattedValue, newVal);
     setDisplayValue(formattedValue); // Update display value with formatted number
     HeaderInputValue(key1, newVal); // Update actual value without commas
-};
+  };
+  
 
 
 
