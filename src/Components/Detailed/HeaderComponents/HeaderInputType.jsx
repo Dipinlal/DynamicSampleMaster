@@ -330,7 +330,7 @@ const DynamicInputFieldHeader = ({
     handleError(errorMessage);
   };
 
-  const handleNumericChange = (value, locale = 'en-US') => {console.log(value);
+  const handleNumericChange = (value) => {
     if (value === '') {
       setDisplayValue(''); // Clear the display value
       HeaderInputValue(key1, null); // Update the value to null or empty string
@@ -339,6 +339,7 @@ const DynamicInputFieldHeader = ({
     if (typeof value !== 'string' || !value) {
       return;
     }
+    const locale = navigator.language;
     
     // Initial removal of disallowed characters based on type and negativity allowance
     let rawValue = value.replace(/[^0-9.-]/g, ''); // Remove everything except digits, minus, and dot
@@ -381,7 +382,7 @@ const DynamicInputFieldHeader = ({
   } else {
       numericalValue = validatedValue === '-' ? '-' : null;
   }
-  console.log(numericalValue,"after pasrse null");
+  
   let formattedValue;
   if (numericalValue === '-' || rawValue.endsWith('.')) {
       formattedValue = rawValue;
@@ -395,6 +396,7 @@ const DynamicInputFieldHeader = ({
     const newVal = handleValidation(numericalValue);
     console.log(formattedValue, newVal);
     setDisplayValue(formattedValue); // Update display value with formatted number
+    console.log(newVal);
     HeaderInputValue(key1, newVal); // Update actual value without commas
   };
   
@@ -507,7 +509,22 @@ const DynamicInputFieldHeader = ({
   };
 
   const handleBlur = (event) => {
-    const rawValue = event.target.value.replace(/,/g, '');  // Remove commas for processing
+    console.log(event.target.value);
+    let rawValue = event.target.value;
+
+    // Assume locale is stored in state or can be retrieved from a global setting
+    const locale = navigator.language; // Example locale, this should be dynamically set based on user settings
+
+    // Normalize the number string based on the locale
+    if (locale.startsWith('de') || locale.startsWith('fr')) {
+        // For locales where comma is the decimal separator and period is the thousands separator
+        rawValue = rawValue.replace(/\./g, ''); // Remove period used as thousands separator
+        rawValue = rawValue.replace(/,/g, '.'); // Convert comma to a period for decimal
+    } else {
+        // For locales like US, where comma is the thousands separator and period is the decimal separator
+        rawValue = rawValue.replace(/,/g, ''); // Remove commas
+    }
+
     const trimmedValue = rawValue.trim();
 
     // Apply validation logic:
@@ -517,20 +534,21 @@ const DynamicInputFieldHeader = ({
     switch (sDatatype) {
         case "integer":
             numericalValue = parseInt(validatedValue, 10);
-            if (isNaN(numericalValue)) numericalValue = null;
             break;
         case "number":
         case "float":
             numericalValue = parseFloat(validatedValue);
-            if (isNaN(numericalValue)) numericalValue = null;
             break;
         default:
             numericalValue = validatedValue;
             break;
     }
 
+    if (isNaN(numericalValue)) numericalValue = null;
+
     HeaderInputValue(key1, numericalValue);
 };
+
   // Additional checking and conversion after typping
   // const handleBlur = (e) => {
   //   let val = e.target.value;
