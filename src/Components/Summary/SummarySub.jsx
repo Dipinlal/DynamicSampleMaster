@@ -48,6 +48,7 @@ export default function Summary() {
   const [selectedDatas, setselectedDatas] = React.useState([]);
   const [totalRows, settotalRows] = useState(0)
   const [refreshFlag, setrefreshFlag] = useState(true)
+  const [searchKey, setsearchKey] = useState("");
 
   const navigate = useNavigate()
   const buttonStyle = {
@@ -77,6 +78,10 @@ export default function Summary() {
     //   setnewOpen(true);
     // }
   };
+  const handleSearchKeyChange = (newSearchKey) => {
+    setsearchKey(newSearchKey);
+  };
+  
   const handleSelectedRowsChange = (selectedRowsData) => {
    
     setselectedDatas(selectedRowsData);
@@ -100,7 +105,7 @@ export default function Summary() {
     handleOpen();
     setSelected([]);
 
-    const response = await getEmployeeSummary({refreshFlag:refreshFlag,pageNumber:pageNumber,pageSize:displayLength,masterId:0});
+    const response = await getEmployeeSummary({refreshFlag:refreshFlag,pageNumber:pageNumber,pageSize:displayLength,masterId:0,searchString:searchKey});
     setrefreshFlag(false)
     if (response?.status === "Success") {
       const myObject = JSON.parse(response?.result);
@@ -124,7 +129,7 @@ export default function Summary() {
   React.useEffect(() => {
     fetchData(); // Initial data fetch
    
-  }, [pageNumber,displayLength]);
+  }, [pageNumber,displayLength,searchKey]);
 
   const handleDisplayLengthChange = (newDisplayLength) => {
     setdisplayLength(newDisplayLength);
@@ -214,7 +219,7 @@ export default function Summary() {
              onDisplayLengthChange={handleDisplayLengthChange}
              onpageNumberChange={handlepageNumberChange}
             //  onSortChange={handleSortChange}
-            //  onSearchKeyChange={handleSearchKeyChange}
+            onSearchKeyChange={handleSearchKeyChange}
              changesTriggered={changesTriggered}
              setchangesTriggered={resetChangesTrigger}
              onSelectedRowsChange={handleSelectedRowsChange}
