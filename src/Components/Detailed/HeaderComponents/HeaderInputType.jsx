@@ -509,45 +509,74 @@ const DynamicInputFieldHeader = ({
   };
 
   const handleBlur = (event) => {
-    console.log(event.target.value);
-    let rawValue = event.target.value;
-
-    // Assume locale is stored in state or can be retrieved from a global setting
-    const locale = navigator.language; // Example locale, this should be dynamically set based on user settings
-
-    // Normalize the number string based on the locale
-    if (locale.startsWith('de') || locale.startsWith('fr')) {
-        // For locales where comma is the decimal separator and period is the thousands separator
-        rawValue = rawValue.replace(/\./g, ''); // Remove period used as thousands separator
-        rawValue = rawValue.replace(/,/g, '.'); // Convert comma to a period for decimal
-    } else {
-        // For locales like US, where comma is the thousands separator and period is the decimal separator
-        rawValue = rawValue.replace(/,/g, ''); // Remove commas
-    }
-
+    if (['integer', 'float'].includes(sDatatype)) {
+      //handleNumericChange(value);
+      return;
+  }
+ 
+    const rawValue = event.target.value.replace(/,/g, '');  // Remove commas for processing
     const trimmedValue = rawValue.trim();
-
-    // Apply validation logic:
     const validatedValue = trimmedValue === "" ? null : handleValidation(trimmedValue);
     let numericalValue;
-
+ 
     switch (sDatatype) {
-        case "integer":
-            numericalValue = parseInt(validatedValue, 10);
-            break;
+        // case "integer":
+        //     numericalValue = parseInt(validatedValue, 10);
+        //     if (isNaN(numericalValue)) numericalValue = null;
+        //     break;
         case "number":
-        case "float":
+        // case "float":
             numericalValue = parseFloat(validatedValue);
+            if (isNaN(numericalValue)) numericalValue = null;
             break;
         default:
             numericalValue = validatedValue;
             break;
     }
 
-    if (isNaN(numericalValue)) numericalValue = null;
-
     HeaderInputValue(key1, numericalValue);
 };
+
+//   const handleBlur = (event) => {
+//     console.log(event.target.value);
+//     let rawValue = event.target.value;
+
+//     // Assume locale is stored in state or can be retrieved from a global setting
+//     const locale = navigator.language; // Example locale, this should be dynamically set based on user settings
+
+//     // Normalize the number string based on the locale
+//     if (locale.startsWith('de') || locale.startsWith('fr')) {
+//         // For locales where comma is the decimal separator and period is the thousands separator
+//         rawValue = rawValue.replace(/\./g, ''); // Remove period used as thousands separator
+//         rawValue = rawValue.replace(/,/g, '.'); // Convert comma to a period for decimal
+//     } else {
+//         // For locales like US, where comma is the thousands separator and period is the decimal separator
+//         rawValue = rawValue.replace(/,/g, ''); // Remove commas
+//     }
+
+//     const trimmedValue = rawValue.trim();
+
+//     // Apply validation logic:
+//     const validatedValue = trimmedValue === "" ? null : handleValidation(trimmedValue);
+//     let numericalValue;
+
+//     switch (sDatatype) {
+//         case "integer":
+//             numericalValue = parseInt(validatedValue, 10);
+//             break;
+//         case "number":
+//         case "float":
+//             numericalValue = parseFloat(validatedValue);
+//             break;
+//         default:
+//             numericalValue = validatedValue;
+//             break;
+//     }
+
+//     if (isNaN(numericalValue)) numericalValue = null;
+
+//     HeaderInputValue(key1, numericalValue);
+// };
 
   // Additional checking and conversion after typping
   // const handleBlur = (e) => {
