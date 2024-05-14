@@ -65,6 +65,8 @@ export default function Summary() {
   };
 
   const handleRowDoubleClick = (rowiId) => {
+    navigate("/MasterDetailed",{ state: { masterId: 0,employeeId:rowiId } })
+    
   
     // if (rowiId === null) {
     //   setAlertMessage("Please Select Row");
