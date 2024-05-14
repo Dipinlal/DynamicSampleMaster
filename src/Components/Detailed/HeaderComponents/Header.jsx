@@ -320,6 +320,10 @@ function Header({
   //         <CircularProgress />
   //     </div>;
   // }
+
+  const tabHasErrors = (tabFields) => {
+    return tabFields.some(field => errorGlobal[field.sFieldName]);
+  };
   return (
     <ThemeProvider theme={theme}>
       <div className="CLTCS2">
@@ -338,7 +342,9 @@ function Header({
           allowScrollButtonsMobile
         >
           {tabNames.map((tabName, index) => (
-            <Tab label={tabName} value={index} key={tabName} />
+            <Tab label={tabName} value={index} key={tabName} style={{
+              color: tabHasErrors(tabData[tabName]) ? 'red' : 'inherit'
+            }}/>
           ))}
         </Tabs>
         {selectedHeaderMain === "Main" && (
